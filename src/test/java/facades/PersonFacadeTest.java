@@ -13,6 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import utils.EMF_Creator;
 
@@ -20,6 +21,7 @@ import utils.EMF_Creator;
  *
  * @author Kasper Jeppesen
  */
+@Disabled
 public class PersonFacadeTest {
     
     private static EntityManagerFactory emf;
@@ -63,7 +65,7 @@ public class PersonFacadeTest {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            em.createNamedQuery("RenameMe.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Person.deleteAllRows").executeUpdate();
             em.persist(new RenameMe("Some txt", "More text"));
             em.persist(new RenameMe("aaa", "bbb"));
 

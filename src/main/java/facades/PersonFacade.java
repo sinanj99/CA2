@@ -59,7 +59,7 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-    public Person addPerson(Person person) {
+    public PersonDTO addPerson(Person person) {
         EntityManager em = emf.createEntityManager();
         
         try{
@@ -70,7 +70,7 @@ public class PersonFacade implements IPersonFacade {
         finally{
             em.close();
         }
-        return person;
+        return new PersonDTO(person);
     }
 
     @Override

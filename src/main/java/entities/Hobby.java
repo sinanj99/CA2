@@ -25,9 +25,7 @@ public class Hobby implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Schema(required = true, example = "coding")
     private String name;
-    @Schema(required = true, example = "writing code")
     private String description;
     @ManyToMany(mappedBy = "hobbies")
     private List<Person> persons;

@@ -27,9 +27,7 @@ public class Address implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Schema(required = true, example = "Lyngbyvej 26")
     private String street;
-    @Schema(required = true, example = "home address")
     private String info;
     @OneToMany(mappedBy = "address")
     private List<Person> persons;

@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface IPersonFacade {
     
-    public Person addPerson(Person person);
+    public PersonDTO addPerson(Person person);
     
     public Person deletePerson(int id);
     

@@ -26,9 +26,7 @@ public class CityInfo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Schema(required = true, example = "2800")
     private String zip;
-    @Schema(required = true, example = "Kgs. Lyngby")
     private String city;
     @OneToMany(mappedBy = "cityInfo")
     private List<Address> addresses;

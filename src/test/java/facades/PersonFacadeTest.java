@@ -106,7 +106,7 @@
 //    // TODO: Delete or change this method 
 //    @Test
 //    public void testGerPersonCount() {
-//        assertEquals(2, facade.getPersonount(), "Expects two rows in the database");
+//        assertEquals(2, facade.getPersonCount(), "Expects two rows in the database");
 //    }
 //    
 //    @Test
@@ -121,11 +121,11 @@
 //        
 //        Person person = new Person("Ida@cphbusiness.dk", "Ida", "Larsen", phone1, address1, hobbies1);
 //        
-//        count = facade.getPersonount();
+//        count = facade.getPersonCount();
 //        facade.addPerson(person);
 //        
 //        //if the person above got persisted, the person count should be equal to the count before it got persisted +1 
-//        assertEquals(count+1, facade.getPersonount());
+//        assertEquals(count+1, facade.getPersonCount());
 //    }
 //    
 //    @Test

@@ -47,7 +47,7 @@ public class PersonFacade implements IPersonFacade {
     }
     
     //TODO Remove/Change this before use
-    public long getPersonount(){
+    public long getPersonCount(){
         EntityManager em = emf.createEntityManager();
         try{
             long PersonCount = (long)em.createQuery("SELECT COUNT(person) FROM Person person").getSingleResult();

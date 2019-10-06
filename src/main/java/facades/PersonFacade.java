@@ -10,9 +10,11 @@ import entities.Address;
 import entities.Hobby;
 import entities.Person;
 import entities.Phone;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -58,7 +60,17 @@ public class PersonFacade implements IPersonFacade {
 
     @Override
     public Person addPerson(Person person) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+            em.getTransaction().begin();
+            em.persist(person);
+            em.getTransaction().commit();
+        }
+        finally{
+            em.close();
+        }
+        return person;
     }
 
     @Override
@@ -73,7 +85,26 @@ public class PersonFacade implements IPersonFacade {
 
     @Override
     public List<PersonDTO> getAllPerson() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+            TypedQuery<Person> query = 
+                       em.createQuery("Select person from Person person",Person.class);
+            
+            List<Person> allPersons = query.getResultList();
+            
+            List<PersonDTO> allPersonsDTO = new LinkedList<>();
+            
+            for(Person person : allPersons){
+                allPersonsDTO.add(new PersonDTO(person));
+            }
+            
+            return allPersonsDTO;
+        }
+        finally{
+            em.close();
+        }
     }
 
     @Override

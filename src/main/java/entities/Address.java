@@ -8,6 +8,7 @@ package entities;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +33,7 @@ public class Address implements Serializable {
     private String info;
     @OneToMany(mappedBy = "address")
     private List<Person> persons;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private CityInfo cityInfo;
 
     public Long getId() {

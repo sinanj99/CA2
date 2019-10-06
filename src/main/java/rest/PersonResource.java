@@ -3,6 +3,11 @@ package rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dto.PersonDTO;
+import entities.Address;
+import entities.CityInfo;
+import entities.Hobby;
+import entities.Person;
+import entities.Phone;
 import entities.RenameMe;
 import utils.EMF_Creator;
 import facades.FacadeExample;
@@ -15,6 +20,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -71,7 +78,15 @@ public class PersonResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public PersonDTO getPerson(@PathParam("id") int id) {
-        return new PersonDTO("", "", "", null);
+        Set<Phone> phones = new HashSet();
+        Phone phone = new Phone("30232376","private");
+        phones.add(phone);
+        CityInfo ci = new CityInfo("2800","lyngby");
+        Address address = new Address(ci,"Lyngbyvej","68");
+        Set<Hobby> hobbies = new HashSet();
+        Hobby hobby = new Hobby("coding","writing code");
+        hobbies.add(hobby);
+        return new PersonDTO(new Person("email","fname","lname",phones,address,hobbies));
     }
 
 }

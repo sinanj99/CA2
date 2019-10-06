@@ -40,8 +40,8 @@ public class Address implements Serializable {
     public Address() {
     }
 
-    public Address(List<Person> persons, Long id, String street, String info) {
-        this.persons = persons;
+    public Address(CityInfo ci, String street, String info) {
+        this.cityInfo = ci;
         this.street = street;
         this.info = info;
     }

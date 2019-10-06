@@ -36,11 +36,11 @@ public class Person implements Serializable {
     private String firstName;
     private String lastName;
     @OneToMany(mappedBy = "person")
-    private Set<Phone> phone; 
+    private Set<Phone> phone = new HashSet(); 
     @ManyToOne
     private Address address;
     @ManyToMany
-    private Set<Hobby> hobbies;
+    private Set<Hobby> hobbies = new HashSet();
 
     public Person() {
     }

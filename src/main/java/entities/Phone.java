@@ -36,8 +36,7 @@ public class Phone implements Serializable {
     public Phone() {
     }
 
-    public Phone(Person person, String number, String description) {
-        this.person = person;
+    public Phone(String number, String description) {
         this.number = number;
         this.description = description;
     }

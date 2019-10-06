@@ -30,8 +30,7 @@ public class CityInfo implements Serializable {
     public CityInfo() {
     }
     
-    public CityInfo(List<Address> addresses, String zip, String city) {
-        this.addresses = addresses;
+    public CityInfo(String zip, String city) {
         this.zip = zip;
         this.city = city;
     }

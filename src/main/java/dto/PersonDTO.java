@@ -19,15 +19,17 @@ public class PersonDTO {
     private String firstName;
     @Schema(required = true, example = "Mortensen")
     private String lastName;
+    @Schema(required = true, example = "{\n\"30232376\":\"private\"\n}")
     private Map<String, String> phones = new HashMap();
     @Schema(required = true, example = "Lyngbyvej 21")
     private String street;
-    @Schema(required = true, example = "Home address")
+    @Schema(example = "Home address")
     private String streetInfo;
     @Schema(required = true, example = "2800")
     private String zip;
     @Schema(required = true, example = "Lyngby")
     private String city;
+    @Schema(required = true, example = "{\n\"coding\":\"writing code\"\n}")
     private Map<String, String> hobbies = new HashMap();
 
     public PersonDTO(Person p) {

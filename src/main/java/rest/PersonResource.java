@@ -8,9 +8,7 @@ import entities.CityInfo;
 import entities.Hobby;
 import entities.Person;
 import entities.Phone;
-import entities.RenameMe;
 import utils.EMF_Creator;
-import facades.FacadeExample;
 import facades.PersonFacade;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +31,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 @OpenAPIDefinition(
@@ -43,7 +42,7 @@ import javax.ws.rs.core.MediaType;
                 contact = @Contact(name = "Lars Mortensen", email = "lam@cphbusiness.dk")
         ),
         tags = {
-            @Tag(name = "movie", description = "API related to Movie Info")
+            @Tag(name = "person", description = "API related to person Info")
 
         },
         servers = {
@@ -69,8 +68,8 @@ public class PersonResource {
             EMF_Creator.Strategy.CREATE);
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    
-    @Operation(summary = "Get Person by ID",
+
+    @Operation(summary = "Get person by id",
             tags = {"person"},
             responses = {
                 @ApiResponse(
@@ -82,17 +81,13 @@ public class PersonResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public PersonDTO getPerson(@PathParam("id") int id) {
-        /*Set<Phone> phones = new HashSet();
-        Phone phone = new Phone("30232376", "private");
-        phones.add(phone);
-        CityInfo ci = new CityInfo("2800", "lyngby");
-        Address address = new Address(ci, "Lyngbyvej", "home address");
-        Set<Hobby> hobbies = new HashSet();
-        Hobby hobby = new Hobby("coding", "writing code");
-        hobbies.add(hobby);
-        return new PersonDTO(new Person("email", "fname", "lname", phones, address, hobbies));*/
-        
-        return FACADE.getPersonById(id);
+        PersonDTO p;
+        try {
+            p = FACADE.getPersonById(id);
+        } catch (NullPointerException e) {
+            throw new WebApplicationException("Person not found", 404);
+        }
+        return p;
     }
 
     @POST
@@ -105,6 +100,15 @@ public class PersonResource {
                 @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body")
             })
     public PersonDTO createPerson(PersonDTO personDTO) {
+
+        if (personDTO.getFirstName() == null || personDTO.getLastName() == null
+                || personDTO.getHobbies() == null || personDTO.getPhones() == null
+                || personDTO.getStreet() == null || personDTO.getStreet() == null
+                || personDTO.getZip() == null) {
+            throw new WebApplicationException("Not all required arguments included", 400);
+        }
+
+        //create necessary entity classes to map DTO to Person entity.
         CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
         Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
         Set<Hobby> hobbies = new HashSet();
@@ -117,10 +121,11 @@ public class PersonResource {
         }
         Person person = new Person(personDTO.getEmail(), personDTO.getFirstName(),
                 personDTO.getLastName(), phones, address, hobbies);
+
         personDTO = FACADE.addPerson(person);
         return personDTO;
     }
-    
+
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -128,9 +133,14 @@ public class PersonResource {
     @Operation(summary = "Edit a person", tags = {"person"},
             responses = {
                 @ApiResponse(responseCode = "200", description = "The person has succesfully been edited"),
-                @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body")
+                @ApiResponse(responseCode = "400", description = "No id provided"),
+                @ApiResponse(responseCode = "404", description = "Person not found")
             })
     public PersonDTO editPerson(PersonDTO personDTO) {
+
+        if (personDTO.getId() == null) {
+            throw new WebApplicationException("No id provided", 400);
+        }
         CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
         Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
         Set<Hobby> hobbies = new HashSet();
@@ -144,10 +154,14 @@ public class PersonResource {
         Person person = new Person(personDTO.getEmail(), personDTO.getFirstName(),
                 personDTO.getLastName(), phones, address, hobbies);
         person.setId(personDTO.getId());
-        personDTO = new PersonDTO(FACADE.editPerson(person));
-        return personDTO; 
+        try {
+            personDTO = new PersonDTO(FACADE.editPerson(person));
+        } catch (NullPointerException e) {
+            throw new WebApplicationException("Person not found", 404);
+        }
+        return personDTO;
     }
-    
+
     @DELETE
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -155,10 +169,14 @@ public class PersonResource {
     @Operation(summary = "Delete a person", tags = {"person"},
             responses = {
                 @ApiResponse(responseCode = "200", description = "The person has succesfully been deleted"),
-                @ApiResponse(responseCode = "400", description = "The person was not found")
+                @ApiResponse(responseCode = "400", description = "Person not found")
             })
     public String deletePerson(@PathParam("id") int id) {
-        FACADE.deletePerson(id);
+        try {
+            FACADE.deletePerson(id);
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException("Person not found", 404);
+        }
         return "{\"status\": \"deleted\"}";
     }
 }

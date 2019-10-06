@@ -5,6 +5,8 @@ import entities.Hobby;
 import entities.Person;
 import entities.Phone;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Schema(name = "Person")
@@ -17,17 +19,31 @@ public class PersonDTO {
     private String firstName;
     @Schema(required = true, example = "Mortensen")
     private String lastName;
-    private Set<Phone> phone;
-    private Address address;
-    private Set<Hobby> hobbies;
+    private Map<String, String> phones = new HashMap();
+    @Schema(required = true, example = "Lyngbyvej 21")
+    private String street;
+    @Schema(required = true, example = "Home address")
+    private String streetInfo;
+    @Schema(required = true, example = "2800")
+    private String zip;
+    @Schema(required = true, example = "Lyngby")
+    private String city;
+    private Map<String, String> hobbies = new HashMap();
 
     public PersonDTO(Person p) {
         this.email = p.getEmail();
         this.firstName = p.getFirstName();
         this.lastName = p.getLastName();
-        this.phone = p.getPhone();
-        this.address = p.getAddress();
-        this.hobbies = p.getHobbies();
+        for(Phone phone : p.getPhone()) {
+            phones.put(phone.getNumber(), phone.getDescription());
+        }
+        this.street = p.getAddress().getStreet();
+        this.streetInfo = p.getAddress().getInfo();
+        this.zip = p.getAddress().getCityInfo().getZip();
+        this.city = p.getAddress().getCityInfo().getCity();
+        for(Hobby hobby : p.getHobbies()) {
+            hobbies.put(hobby.getName(), hobby.getDescription());
+        }
     }
 
     public PersonDTO() {
@@ -65,28 +81,55 @@ public class PersonDTO {
         this.lastName = lastName;
     }
 
-    public Set<Phone> getPhone() {
-        return phone;
+    public String getStreet() {
+        return street;
     }
 
-    public void setPhone(Set<Phone> phone) {
-        this.phone = phone;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
-    public Address getAddress() {
-        return address;
+    public String getStreetInfo() {
+        return streetInfo;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setStreetInfo(String streetInfo) {
+        this.streetInfo = streetInfo;
     }
 
-    public Set<Hobby> getHobbies() {
+    
+
+    public Map<String, String> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(Map<String, String> phones) {
+        this.phones = phones;
+    }
+
+    public Map<String, String> getHobbies() {
         return hobbies;
     }
 
-    public void setHobbies(Set<Hobby> hobbies) {
+    public void setHobbies(Map<String, String> hobbies) {
         this.hobbies = hobbies;
     }
-    
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+
 }

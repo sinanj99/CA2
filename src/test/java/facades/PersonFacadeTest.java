@@ -5,6 +5,7 @@
  */
 package facades;
 
+import dto.PersonDTO;
 import entities.Address;
 import entities.CityInfo;
 import entities.Hobby;
@@ -12,6 +13,7 @@ import entities.Person;
 import entities.Phone;
 import entities.RenameMe;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -124,6 +126,15 @@ public class PersonFacadeTest {
         
         //if the person above got persisted, the person count should be equal to the count before it got persisted +1 
         assertEquals(count+1, facade.getPersonount());
+    }
+    
+    @Test
+    public void testGetAllPersons(){
+        List<PersonDTO> allPersons;
+        
+        allPersons = facade.getAllPerson();
+        
+        assertEquals(2, allPersons.size());
     }
     
 }

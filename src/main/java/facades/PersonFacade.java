@@ -75,12 +75,29 @@ public class PersonFacade implements IPersonFacade {
 
     @Override
     public Person deletePerson(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        EntityManager em = emf.createEntityManager();
+        try{
+            em.getTransaction().begin();
+            Person p = em.find(Person.class, Long.valueOf(id));
+            em.remove(p);
+            em.getTransaction().commit();
+            return p;
+        }finally{
+            em.close();
+        }
     }
 
     @Override
-    public Person editperson(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Person editPerson(Person person) {
+        EntityManager em = emf.createEntityManager();
+        try{
+            em.getTransaction().begin();
+            em.merge(person);
+            em.getTransaction().commit();
+            return person;
+        }finally{
+            em.close();
+        }
     }
 
     @Override
@@ -120,5 +137,15 @@ public class PersonFacade implements IPersonFacade {
     @Override
     public PersonDTO getPersonByPhone(Phone phone) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public PersonDTO getPersonById(int id) {
+        EntityManager em = emf.createEntityManager();
+        try{
+            return new PersonDTO(em.find(Person.class, Long.valueOf(id)));
+        }finally{
+            em.close();
+        }
     }
 }

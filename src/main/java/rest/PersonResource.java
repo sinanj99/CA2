@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -67,7 +68,8 @@ public class PersonResource {
             "ax2",
             EMF_Creator.Strategy.CREATE);
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
-
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    
     @Operation(summary = "Get Person by ID",
             tags = {"person"},
             responses = {
@@ -80,7 +82,7 @@ public class PersonResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public PersonDTO getPerson(@PathParam("id") int id) {
-        Set<Phone> phones = new HashSet();
+        /*Set<Phone> phones = new HashSet();
         Phone phone = new Phone("30232376", "private");
         phones.add(phone);
         CityInfo ci = new CityInfo("2800", "lyngby");
@@ -88,7 +90,9 @@ public class PersonResource {
         Set<Hobby> hobbies = new HashSet();
         Hobby hobby = new Hobby("coding", "writing code");
         hobbies.add(hobby);
-        return new PersonDTO(new Person("email", "fname", "lname", phones, address, hobbies));
+        return new PersonDTO(new Person("email", "fname", "lname", phones, address, hobbies));*/
+        
+        return FACADE.getPersonById(id);
     }
 
     @POST
@@ -115,5 +119,46 @@ public class PersonResource {
                 personDTO.getLastName(), phones, address, hobbies);
         personDTO = FACADE.addPerson(person);
         return personDTO;
+    }
+    
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+
+    @Operation(summary = "Edit a person", tags = {"person"},
+            responses = {
+                @ApiResponse(responseCode = "200", description = "The person has succesfully been edited"),
+                @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body")
+            })
+    public PersonDTO editPerson(PersonDTO personDTO) {
+        CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
+        Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
+        Set<Hobby> hobbies = new HashSet();
+        Set<Phone> phones = new HashSet();
+        for (Map.Entry<String, String> hobby : personDTO.getHobbies().entrySet()) {
+            hobbies.add(new Hobby(hobby.getKey(), hobby.getValue()));
+        }
+        for (Map.Entry<String, String> phone : personDTO.getPhones().entrySet()) {
+            phones.add(new Phone(phone.getKey(), phone.getValue()));
+        }
+        Person person = new Person(personDTO.getEmail(), personDTO.getFirstName(),
+                personDTO.getLastName(), phones, address, hobbies);
+        person.setId(personDTO.getId());
+        personDTO = new PersonDTO(FACADE.editPerson(person));
+        return personDTO; 
+    }
+    
+    @DELETE
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON})
+    @Operation(summary = "Delete a person", tags = {"person"},
+            responses = {
+                @ApiResponse(responseCode = "200", description = "The person has succesfully been deleted"),
+                @ApiResponse(responseCode = "400", description = "The person was not found")
+            })
+    public String deletePerson(@PathParam("id") int id) {
+        FACADE.deletePerson(id);
+        return "{\"status\": \"deleted\"}";
     }
 }

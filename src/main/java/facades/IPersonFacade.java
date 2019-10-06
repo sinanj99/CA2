@@ -22,9 +22,11 @@ public interface IPersonFacade {
     
     public Person deletePerson(int id);
     
-    public Person editperson(int id);
+    public Person editPerson(Person person);
     
     public List<PersonDTO> getAllPerson();
+    
+    public PersonDTO getPersonById(int id);
     
     public List<PersonDTO> getPersonsByHobby(Hobby hobby);
     

@@ -40,12 +40,13 @@ public class Person implements Serializable {
     @ManyToOne
     private Address address;
     @ManyToMany
-    private List<Hobby> hobbies;
+    private Set<Hobby> hobbies;
 
     public Person() {
     }
 
-    public Person(String email, String firstName, String lastName, Set<Phone> phone, Address address, List<Hobby> hobbies) {
+    public Person(String email, String firstName, String lastName, 
+            Set<Phone> phone, Address address, Set<Hobby> hobbies) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -127,11 +128,11 @@ public class Person implements Serializable {
         this.address = address;
     }
 
-    public List<Hobby> getHobbies() {
+    public Set<Hobby> getHobbies() {
         return hobbies;
     }
 
-    public void setHobbies(List<Hobby> hobbies) {
+    public void setHobbies(Set<Hobby> hobbies) {
         this.hobbies = hobbies;
     }
     

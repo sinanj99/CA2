@@ -91,6 +91,7 @@ public class PersonFacade implements IPersonFacade {
     public Person editPerson(Person person) {
         EntityManager em = emf.createEntityManager();
         try{
+            if(em.find(Person.class, person.getId())==null) throw new NullPointerException();
             em.getTransaction().begin();
             em.merge(person);
             em.getTransaction().commit();

@@ -23,17 +23,29 @@ public class Address implements Serializable {
 
     @OneToMany(mappedBy = "address")
     private List<Person> persons;
-
+    
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+    private String street;
+    private String info;
+    @ManyToOne
+    private CityInfo cityInfo;
 
     public Long getId() {
         return id;
     }
 
+    public Address() {
+    }
+
+    public Address(List<Person> persons, Long id, String street, String info) {
+        this.persons = persons;
+        this.street = street;
+        this.info = info;
+    }
+    
     public void setId(Long id) {
         this.id = id;
     }

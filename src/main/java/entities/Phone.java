@@ -25,11 +25,21 @@ public class Phone implements Serializable {
     private Person person;
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String number;
+    private String description;
     public Long getId() {
         return id;
+    }
+
+    public Phone() {
+    }
+
+    public Phone(Person person, String number, String description) {
+        this.person = person;
+        this.number = number;
+        this.description = description;
     }
 
     public void setId(Long id) {

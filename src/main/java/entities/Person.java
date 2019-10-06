@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -40,24 +41,19 @@ public class Person implements Serializable {
     private Address address;
     @ManyToMany
     private List<Hobby> hobbies;
-    
-    
-    
-    
-   
-    
-    
+
     public Person() {
     }
 
-    public Person(String email, String firstName, String lastName, Set<Phone> phone) {
+    public Person(String email, String firstName, String lastName, Set<Phone> phone, Address address, List<Hobby> hobbies) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
+        this.address = address;
+        this.hobbies = hobbies;
     }
-    
-    
+
     public Long getId() {
         return id;
     }

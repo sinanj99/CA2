@@ -25,12 +25,25 @@ public class Hobby implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
+    private String description;
 
     public Long getId() {
         return id;
     }
+
+    public Hobby() {
+    }
+
+    public Hobby(List<Person> persons, String name, String description) {
+        this.persons = persons;
+        this.name = name;
+        this.description = description;
+    }
+
+    
 
     public void setId(Long id) {
         this.id = id;

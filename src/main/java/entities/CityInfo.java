@@ -6,10 +6,12 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -20,13 +22,27 @@ public class CityInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @OneToMany(mappedBy = "cityInfo")
+    private List<Address> addresses;
 
+    public CityInfo() {
+    }
+    
+    public CityInfo(List<Address> addresses, String zip, String city) {
+        this.addresses = addresses;
+        this.zip = zip;
+        this.city = city;
+    }
+    
+    
     public Long getId() {
         return id;
     }
-
+    private String zip;
+    private String city;
+    
     public void setId(Long id) {
         this.id = id;
     }

@@ -13,7 +13,7 @@ import java.util.Set;
 public class PersonDTO {
 
     private Long id;
-    @Schema(required = true, example = "lars@lars.dk")
+    @Schema(example = "lars@lars.dk")
     private String email;
     @Schema(required = true, example = "Lars")
     private String firstName;

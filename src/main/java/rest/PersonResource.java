@@ -11,6 +11,7 @@ import entities.Phone;
 import entities.RenameMe;
 import utils.EMF_Creator;
 import facades.FacadeExample;
+import facades.PersonFacade;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Consumes;
@@ -64,7 +66,7 @@ public class PersonResource {
             "dev",
             "ax2",
             EMF_Creator.Strategy.CREATE);
-    private static final FacadeExample FACADE = FacadeExample.getFacadeExample(EMF);
+    private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
 
     @Operation(summary = "Get Person by ID",
             tags = {"person"},
@@ -79,14 +81,39 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     public PersonDTO getPerson(@PathParam("id") int id) {
         Set<Phone> phones = new HashSet();
-        Phone phone = new Phone("30232376","private");
+        Phone phone = new Phone("30232376", "private");
         phones.add(phone);
-        CityInfo ci = new CityInfo("2800","lyngby");
-        Address address = new Address(ci,"Lyngbyvej","68");
+        CityInfo ci = new CityInfo("2800", "lyngby");
+        Address address = new Address(ci, "Lyngbyvej", "home address");
         Set<Hobby> hobbies = new HashSet();
-        Hobby hobby = new Hobby("coding","writing code");
+        Hobby hobby = new Hobby("coding", "writing code");
         hobbies.add(hobby);
-        return new PersonDTO(new Person("email","fname","lname",phones,address,hobbies));
+        return new PersonDTO(new Person("email", "fname", "lname", phones, address, hobbies));
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+
+    @Operation(summary = "Create new person", tags = {"person"},
+            responses = {
+                @ApiResponse(responseCode = "200", description = "The newly created person"),
+                @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body")
+            })
+    public PersonDTO createPerson(PersonDTO personDTO) {
+        CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
+        Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
+        Set<Hobby> hobbies = new HashSet();
+        Set<Phone> phones = new HashSet();
+        for (Map.Entry<String, String> hobby : personDTO.getHobbies().entrySet()) {
+            hobbies.add(new Hobby(hobby.getKey(), hobby.getValue()));
+        }
+        for (Map.Entry<String, String> phone : personDTO.getPhones().entrySet()) {
+            phones.add(new Phone(phone.getKey(), phone.getValue()));
+        }
+        Person person = new Person(personDTO.getEmail(), personDTO.getFirstName(),
+                personDTO.getLastName(), phones, address, hobbies);
+        personDTO = FACADE.addPerson(person);
+        return personDTO;
+    }
 }

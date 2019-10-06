@@ -5,6 +5,7 @@
  */
 package entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -20,16 +21,17 @@ import javax.persistence.ManyToMany;
 @Entity
 public class Hobby implements Serializable {
 
-    @ManyToMany(mappedBy = "hobbies")
-    private List<Person> persons;
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Schema(required = true, example = "coding")
     private String name;
+    @Schema(required = true, example = "writing code")
     private String description;
-
+    @ManyToMany(mappedBy = "hobbies")
+    private List<Person> persons;
+    
     public Long getId() {
         return id;
     }

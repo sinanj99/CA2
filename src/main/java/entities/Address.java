@@ -5,6 +5,7 @@
  */
 package entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -20,16 +21,17 @@ import javax.persistence.OneToMany;
  */
 @Entity
 public class Address implements Serializable {
-
-    @OneToMany(mappedBy = "address")
-    private List<Person> persons;
     
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Schema(required = true, example = "Lyngbyvej 26")
     private String street;
+    @Schema(required = true, example = "home address")
     private String info;
+    @OneToMany(mappedBy = "address")
+    private List<Person> persons;
     @ManyToOne
     private CityInfo cityInfo;
 

@@ -5,6 +5,7 @@
  */
 package entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -24,24 +25,25 @@ public class CityInfo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Schema(required = true, example = "2800")
+    private String zip;
+    @Schema(required = true, example = "Kgs. Lyngby")
+    private String city;
     @OneToMany(mappedBy = "cityInfo")
     private List<Address> addresses;
 
     public CityInfo() {
     }
-    
+
     public CityInfo(String zip, String city) {
         this.zip = zip;
         this.city = city;
     }
-    
-    
+
     public Long getId() {
         return id;
     }
-    private String zip;
-    private String city;
-    
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -94,5 +96,5 @@ public class CityInfo implements Serializable {
     public void setCity(String city) {
         this.city = city;
     }
-    
+
 }

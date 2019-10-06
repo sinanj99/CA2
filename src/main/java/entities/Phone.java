@@ -5,6 +5,7 @@
  */
 package entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,17 +19,18 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class Phone implements Serializable {
-
     
-
-    @ManyToOne
-    private Person person;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Schema(required = true, example = "42446732")
     private String number;
+    @Schema(required = true, example = "private")
     private String description;
+    @ManyToOne
+    private Person person;
+    
     public Long getId() {
         return id;
     }

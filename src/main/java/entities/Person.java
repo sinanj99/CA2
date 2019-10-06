@@ -13,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
@@ -21,6 +23,7 @@ import javax.persistence.OneToMany;
  * @author sinanjasar
  */
 @Entity
+
 @NamedQuery(name = "Person.deleteAllRows", query = "DELETE from Person")
 public class Person implements Serializable {
 
@@ -32,8 +35,18 @@ public class Person implements Serializable {
     private String firstName;
     private String lastName;
     @OneToMany(mappedBy = "person")
-    private Set<Phone> phone;
-
+    private Set<Phone> phone; 
+    @ManyToOne
+    private Address address;
+    @ManyToMany
+    private List<Hobby> hobbies;
+    
+    
+    
+    
+   
+    
+    
     public Person() {
     }
 

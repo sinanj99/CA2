@@ -19,6 +19,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Phone implements Serializable {
 
+    
+
     @ManyToOne
     private Person person;
     private static final long serialVersionUID = 1L;

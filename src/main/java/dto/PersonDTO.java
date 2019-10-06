@@ -17,11 +17,8 @@ public class PersonDTO {
     private String firstName;
     @Schema(required = true, example = "Mortensen")
     private String lastName;
-    @Schema(required = true)
     private Set<Phone> phone;
-    @Schema(required = true)
     private Address address;
-    @Schema(required = true)
     private Set<Hobby> hobbies;
 
     public PersonDTO(Person p) {
@@ -76,4 +73,20 @@ public class PersonDTO {
         this.phone = phone;
     }
 
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Set<Hobby> getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(Set<Hobby> hobbies) {
+        this.hobbies = hobbies;
+    }
+    
 }

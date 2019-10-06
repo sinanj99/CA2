@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Set;
 
 @Schema(name = "Person")  //Because of this we could have called the class MovieInfoDTO
-public class Person {
+public class PersonDTO {
 
     private Long id;
     @Schema(required = true, example = "lars@lars.dk")
@@ -16,14 +16,14 @@ public class Person {
     @Schema(example = "[\"Work\",\"23213444\"]")
     private Set<String> phone;
 
-    public Person(String email, String firstName, String lastName, Set<String> phone) {
+    public PersonDTO(String email, String firstName, String lastName, Set<String> phone) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
     }
 
-    public Person() {
+    public PersonDTO() {
     }
 
     public Long getId() {

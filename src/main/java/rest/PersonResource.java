@@ -2,7 +2,7 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dto.Person;
+import dto.PersonDTO;
 import entities.RenameMe;
 import utils.EMF_Creator;
 import facades.FacadeExample;
@@ -63,15 +63,15 @@ public class PersonResource {
             tags = {"person"},
             responses = {
                 @ApiResponse(
-                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = Person.class))),
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
                 @ApiResponse(responseCode = "200", description = "The Requested Person"),
                 @ApiResponse(responseCode = "404", description = "Person not found")})
 
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Person getPerson(@PathParam("id") int id) {
-        return new Person("", "", "", null);
+    public PersonDTO getPerson(@PathParam("id") int id) {
+        return new PersonDTO("", "", "", null);
     }
 
 }

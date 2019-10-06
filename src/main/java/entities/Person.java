@@ -118,5 +118,21 @@ public class Person implements Serializable {
     public void setPhone(Set<Phone> phone) {
         this.phone = phone;
     }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public List<Hobby> getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(List<Hobby> hobbies) {
+        this.hobbies = hobbies;
+    }
     
 }

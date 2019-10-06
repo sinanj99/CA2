@@ -24,9 +24,7 @@ public class Phone implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Schema(required = true, example = "42446732")
     private String number;
-    @Schema(required = true, example = "private")
     private String description;
     @ManyToOne
     private Person person;

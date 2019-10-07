@@ -35,11 +35,11 @@ public class Person implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
-    @OneToMany(mappedBy = "person", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<Phone> phone = new HashSet(); 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Address address;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<Hobby> hobbies = new HashSet();
 
     public Person() {

@@ -35,7 +35,19 @@ public class PersonFacadeTest {
     
     private static EntityManagerFactory emf;
     private static PersonFacade facade;
-
+    
+    Set<Phone> phone = new HashSet<>();
+    Set<Hobby> hobbies = new HashSet<>();
+    Address address = new Address(new CityInfo("3000", "Helsingør"), "Sigurdsvej", "Hjemme");
+    
+    {
+        phone.add(new Phone("55661122", "Hjemme nummer"));
+        hobbies.add(new Hobby("Klatring", "Det går op af"));
+    }
+    
+    Person personUsedToGetID = new Person("Emil@cphbusiness.dk", "Emil", "Emilsen", phone, address, hobbies);
+           
+    
     public PersonFacadeTest() {
     }
 
@@ -89,8 +101,9 @@ public class PersonFacadeTest {
             
             em.getTransaction().begin();
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
-            em.persist(new Person("Tom@cphbusiness.dk", "Tom", "Tomsen", phone1, address1, hobbies1));
+            em.persist(new Person("Tom@cphbusiness.dk", "Tom", "Jensen", phone1, address1, hobbies1));
             em.persist(new Person("Kim@cphbusiness.dk", "Kim", "Kimsen", phone2, address2, hobbies2));
+            em.persist(personUsedToGetID);
 
             em.getTransaction().commit();
         } finally {
@@ -106,7 +119,7 @@ public class PersonFacadeTest {
     // TODO: Delete or change this method 
     @Test
     public void testGerPersonCount() {
-        assertEquals(2, facade.getPersonCount(), "Expects two rows in the database");
+        assertEquals(3, facade.getPersonCount(), "Expects two rows in the database");
     }
     
     @Test
@@ -129,12 +142,23 @@ public class PersonFacadeTest {
     }
     
     @Test
+    public void testDeletePerson()
+    {
+        Long count;
+        
+        count = facade.getPersonCount();
+        facade.deletePerson( personUsedToGetID.getId().intValue());
+        
+        assertEquals(count-1, facade.getPersonCount());
+    }
+    
+    @Test
     public void testGetAllPersons(){
         List<PersonDTO> allPersons;
         
         allPersons = facade.getAllPerson();
         
-        assertEquals(2, allPersons.size());
+        assertEquals(3, allPersons.size());
     }
     
 }

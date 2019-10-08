@@ -132,7 +132,25 @@ public class PersonFacade implements IPersonFacade {
 
     @Override
     public List<PersonDTO> getPersonByCity(Address address) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+           TypedQuery<Person> query = 
+                       em.createQuery("Select person from Person person where person.address.cityInfo.city = :address",Person.class);
+           query.setParameter("address", address.getCityInfo().getCity());
+           
+           List<Person> allPersonsInTheCity = query.getResultList();
+           List<PersonDTO> allPersonsInTheCityDTO = new LinkedList<>();
+           
+           for(Person person : allPersonsInTheCity){
+               allPersonsInTheCityDTO.add(new PersonDTO(person));
+           }
+           
+           return allPersonsInTheCityDTO;
+        }
+        finally{
+            em.close();
+        }
     }
 
     @Override

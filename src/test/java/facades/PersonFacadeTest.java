@@ -161,4 +161,14 @@ public class PersonFacadeTest {
         assertEquals(3, allPersons.size());
     }
     
+    @Test
+    public void testGetPersonByCity()
+    {
+        List<PersonDTO> allPersonsInTheCity = facade.getPersonByCity(address);
+        
+        for(PersonDTO person : allPersonsInTheCity){
+            assertEquals(address.getCityInfo().getCity(), person.getCity());
+        }
+    }
+    
 }

@@ -6,6 +6,7 @@ import entities.Hobby;
 import entities.Person;
 import entities.Phone;
 import entities.RenameMe;
+import facades.PersonFacade;
 import utils.EMF_Creator;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
@@ -50,14 +51,14 @@ public class PersonResourceTest {
     Person person = new Person("michael@cphbusiness.dk", "Michael", "Pedersen", p_Phones, p_Address, p_hobbies);
     
     // Person 2 info:
-    Address p2_Address = new Address(new CityInfo("2200", "København Ø"), "Tagensvej", "Hjem");
+    Address p2_Address = new Address(new CityInfo("2100", "København Ø"), "Victor Bendix Gade", "Hjem");
     List<Phone> p2_Phones = new ArrayList();
     List<Hobby> p2_hobbies = new ArrayList(); 
     {
-        p2_Phones.add(new Phone("12345678", "Hjem"));
+        p2_Phones.add(new Phone("87654321", "Hjem"));
         p2_hobbies.add(new Hobby("Eating", "I love food!"));
     }
-    Person person2 = new Person("michael@cphbusiness.dk", "Michael", "Pedersen", p2_Phones, p2_Address, p2_hobbies);
+    Person person2 = new Person("mads@cphbusiness.dk", "Mads", "Andersen", p2_Phones, p2_Address, p2_hobbies);
 
     static HttpServer startServer() {
         ResourceConfig rc = ResourceConfig.forApplication(new ApplicationConfig());
@@ -68,7 +69,7 @@ public class PersonResourceTest {
     public static void setUpClass() {
         //This method must be called before you request the EntityManagerFactory
         EMF_Creator.startREST_TestWithDB();
-        emf = EMF_Creator.createEntityManagerFactory(DbSelector.TEST, Strategy.CREATE);
+        emf = EMF_Creator.createEntityManagerFactory(DbSelector.TEST, Strategy.DROP_AND_CREATE);
         
         httpServer = startServer();
         //Setup RestAssured
@@ -102,7 +103,20 @@ public class PersonResourceTest {
     }
     
     @Test
+    public void testGetPersonCount(){
+        given()
+        .contentType("application/json")
+        .get("/person/count").then()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .log().body()
+        .body("count", equalTo(2));
+    }
+    
+    @Test
     public void testGetById(){
+        System.out.println("--------------------- Get person by id test -------------------------");
+        System.out.println("--------------------- Person 1 --------------------------------------");
         //Person 1
         given()
         .contentType("application/json")
@@ -111,11 +125,10 @@ public class PersonResourceTest {
         .statusCode(HttpStatus.OK_200.getStatusCode())
         .log().body()
         .body("firstName", equalTo(person.getFirstName()))
-        .and()
-        .body("lastName", equalTo(person.getLastName()))
-        .and()  
+        .body("lastName", equalTo(person.getLastName())) 
         .body("email", equalTo(person.getEmail()));
         
+        System.out.println("--------------------- Person 2 --------------------------------------");
         //Person 2
         given()
         .contentType("application/json")
@@ -124,9 +137,104 @@ public class PersonResourceTest {
         .statusCode(HttpStatus.OK_200.getStatusCode())
         .log().body()
         .body("firstName", equalTo(person2.getFirstName()))
-        .and()
-        .body("lastName", equalTo(person2.getLastName()))
-        .and()  
+        .body("lastName", equalTo(person2.getLastName())) 
         .body("email", equalTo(person2.getEmail()));
+    }
+    
+    @Test
+    public void testAddPerson(){
+        System.out.println("--------------------- Add person test -------------------------");
+        String json =   "{\n" +
+                        "  \"id\": 0,\n" +
+                        "  \"email\": \"mathias@cphbusiness.dk\",\n" +
+                        "  \"firstName\": \"Mathias\",\n" +
+                        "  \"lastName\": \"Stenberg\",\n" +
+                        "  \"phones\": [\n" +
+                        "    \"number:30232376,description:private\",\n" +
+                        "    \"number:40455045,description:work\"\n" +
+                        "  ],\n" +
+                        "  \"street\": \"Lyngbyvej 21\",\n" +
+                        "  \"streetInfo\": \"Home address\",\n" +
+                        "  \"zip\": \"2800\",\n" +
+                        "  \"city\": \"Lyngby\",\n" +
+                        "  \"hobbies\": [\n" +
+                        "    \"name:coding,description:writing code\",\n" +
+                        "    \"name:beer,description:drinking beer\"\n" +
+                        "  ]\n" +
+                        "}";
+        
+        given()
+        .contentType("application/json")
+        .accept("application/json")
+        .body(json)
+        .post("/person/").then()      
+        .log().body()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .body("firstName", equalTo("Mathias"))
+        .body("lastName", equalTo("Stenberg")) 
+        .body("email", equalTo("mathias@cphbusiness.dk"));
+        
+        given()
+        .contentType("application/json")
+        .get("/person/count").then()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .log().body()
+        .body("count", equalTo(3));
+        
+    }
+    
+    @Test
+    public void testEditPerson(){
+        System.out.println("--------------------- Edit person test -------------------------");
+        String json =   "{\n" +
+                        "\"id\": "+ person2.getId() +" ," +
+                        "    \"city\": \"Frederiksberg\",\n" +
+                        "    \"email\": \"rasmus@cphbusiness.dk\",\n" +
+                        "    \"firstName\": \"Rasmus\",\n" +
+                        "    \"hobbies\": [\n" +
+                        "        \"name:running,description:Do you even cardio bro?\"\n" +
+                        "    ],\n" +
+                        "    \"lastName\": \"Ejlers\",\n" +
+                        "    \"phones\": [\n" +
+                        "         \"number:30232376,description:private\"\n" +
+                        "    ],\n" +
+                        "    \"street\": \"Roskildevej 32\",\n" +
+                        "    \"streetInfo\": \"Hjem\",\n" +
+                        "    \"zip\": \"2000\"\n" +
+                        "}";
+        
+        given()
+        .contentType("application/json")
+        .accept("application/json")
+        .body(json)
+        .put("/person/").then()      
+        .log().body()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .body("firstName", equalTo("Rasmus"))
+        .body("lastName", equalTo("Ejlers")) 
+        .body("email", equalTo("rasmus@cphbusiness.dk"));
+    }
+    
+    @Test
+    public void testDeletePerson(){
+        System.out.println("--------------------- Delete person test -------------------------");
+        given()
+        .contentType("application/json")
+        .delete("/person/" + person.getId()).then()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .log().body()
+        .body("status", equalTo("deleted"));
+        
+        given()
+        .contentType("application/json")
+        .get("/person/count").then()
+        .assertThat()
+        .statusCode(HttpStatus.OK_200.getStatusCode())
+        .log().body()
+        .body("count", equalTo(1));
     }
 }

@@ -19,7 +19,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
@@ -101,28 +103,16 @@ public class PersonResource {
             })
     public PersonDTO createPerson(PersonDTO personDTO) {
 
+        //check for missing input
         if (personDTO.getFirstName() == null || personDTO.getLastName() == null
                 || personDTO.getHobbies() == null || personDTO.getPhones() == null
                 || personDTO.getStreet() == null || personDTO.getStreet() == null
                 || personDTO.getZip() == null) {
             throw new WebApplicationException("Not all required arguments included", 400);
         }
-
-        //create necessary entity classes to map DTO to Person entity.
-        CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
-        Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
-        Set<Hobby> hobbies = new HashSet();
-        Set<Phone> phones = new HashSet();
-        for (Map.Entry<String, String> hobby : personDTO.getHobbies().entrySet()) {
-            hobbies.add(new Hobby(hobby.getKey(), hobby.getValue()));
-        }
-        for (Map.Entry<String, String> phone : personDTO.getPhones().entrySet()) {
-            phones.add(new Phone(phone.getKey(), phone.getValue()));
-        }
-        Person person = new Person(personDTO.getEmail(), personDTO.getFirstName(),
-                personDTO.getLastName(), phones, address, hobbies);
-
+        Person person = DTOMapper(personDTO);
         personDTO = FACADE.addPerson(person);
+        
         return personDTO;
     }
 
@@ -140,25 +130,16 @@ public class PersonResource {
 
         if (personDTO.getId() == null) {
             throw new WebApplicationException("No id provided", 400);
-        }
-        CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
-        Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
-        Set<Hobby> hobbies = new HashSet();
-        Set<Phone> phones = new HashSet();
-        for (Map.Entry<String, String> hobby : personDTO.getHobbies().entrySet()) {
-            hobbies.add(new Hobby(hobby.getKey(), hobby.getValue()));
-        }
-        for (Map.Entry<String, String> phone : personDTO.getPhones().entrySet()) {
-            phones.add(new Phone(phone.getKey(), phone.getValue()));
-        }
-        Person person = new Person(personDTO.getEmail(), personDTO.getFirstName(),
-                personDTO.getLastName(), phones, address, hobbies);
+        } 
+        Person person = DTOMapper(personDTO);
         person.setId(personDTO.getId());
+
         try {
             personDTO = new PersonDTO(FACADE.editPerson(person));
         } catch (NullPointerException e) {
             throw new WebApplicationException("Person not found", 404);
         }
+
         return personDTO;
     }
 
@@ -178,5 +159,26 @@ public class PersonResource {
             throw new WebApplicationException("Person not found", 404);
         }
         return "{\"status\": \"deleted\"}";
+    }
+    private Person DTOMapper(PersonDTO personDTO) {
+        
+        //map DTO to Person entity
+        CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
+        Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
+        List<Hobby> hobbies = new ArrayList();
+        List<Phone> phones = new ArrayList();
+        //syntax for hobbies is: "name:value,description:value"
+        for (String hobby : personDTO.getHobbies()) {
+            hobbies.add(new Hobby(hobby.split(",")[0].split(":")[1],
+                    hobby.split(",")[1].split(":")[1]));
+        }
+        //syntax for phones is: "number:value,description:value"
+        for (String phone : personDTO.getPhones()) {
+            phones.add(new Phone(phone.split(",")[0].split(":")[1],
+                    phone.split(",")[1].split(":")[1]));
+        }
+        return new Person(personDTO.getEmail(), personDTO.getFirstName(),
+                personDTO.getLastName(), phones, address, hobbies);
+        
     }
 }

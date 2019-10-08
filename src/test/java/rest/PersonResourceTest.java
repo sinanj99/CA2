@@ -267,13 +267,40 @@ public class PersonResourceTest {
         .log().body()
         .assertThat()
         .statusCode(HttpStatus.BAD_REQUEST_400.getStatusCode())
-        .body("code", equalTo(400));
-        /*.body("message", equalTo("Not all arguments provided with the body"));
+        .body("code", equalTo(400))
+        .body("message", equalTo("Not all arguments provided with the body"));
+    }
+    @Test
+    public void testAddPersonFail2(){
+        System.out.println("--------------------- (FAIL2) Add person test -------------------------");
+        String json =   "{\n" +
+                        "  \"email\": \"mathias@cphbusiness.dk\",\n" +
+                        "  \"firstName\": \"Mathias\",\n" +
+                        "  \"lastName\": \"Stenberg\",\n" +
+                        "  \"phones\": [\n" +
+                        "    \"number:12345678,description:private\",\n" +
+                        "    \"number:40455045,description:work\"\n" +
+                        "  ],\n" +
+                        "  \"street\": \"Lyngbyvej 21\",\n" +
+                        "  \"streetInfo\": \"Home address\",\n" +
+                        "  \"zip\": \"2800\",\n" +
+                        "  \"city\": \"Lyngby\",\n" +
+                        "  \"hobbies\": [\n" +
+                        "    \"name:coding,description:writing code\",\n" +
+                        "    \"name:beer,description:drinking beer\"\n" +
+                        "  ]\n" +
+                        "}";
         
-            Af en eller anden årsag er message: Not all required arguments included
-            selvom at ApiResponse description er sat til: Not all arguments provided with the body
-        */
-        
+        given()
+        .contentType("application/json")
+        .accept("application/json")
+        .body(json)
+        .post("/person/").then()      
+        .log().body()
+        .assertThat()
+        .statusCode(HttpStatus.CONFLICT_409.getStatusCode())
+        .body("code", equalTo(409))
+        .body("message", equalTo("Person already exists"));
     }
     
     @Test

@@ -78,7 +78,7 @@ public class PersonResource {
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
                 @ApiResponse(responseCode = "200", description = "The Requested Person"),
                 @ApiResponse(responseCode = "404", description = "Person not found")})
-
+    
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -91,7 +91,21 @@ public class PersonResource {
         }
         return p;
     }
-
+    
+    
+    @Operation(summary = "Get person count",
+            tags = {"person"},
+            responses = {
+                @ApiResponse(
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
+                @ApiResponse(responseCode = "200", description = "The person count has succesfully been fetched")})
+    @GET
+    @Path("count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getPersonCount() {
+        return "{\"count\""+":"+FACADE.getPersonCount()+"}";
+    }
+    
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

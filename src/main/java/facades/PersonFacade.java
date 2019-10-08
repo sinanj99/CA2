@@ -77,7 +77,7 @@ public class PersonFacade implements IPersonFacade {
                     = em.createQuery("SELECT p FROM Phone p WHERE p.number = :number", Phone.class);
             findNumber.setParameter("number", privateNumber);
             if (!findNumber.getResultList().isEmpty()) {
-                throw new WebApplicationException("person already exists", 401);
+                throw new WebApplicationException("Person already exists", 409);
             }
             //check if address already exists, so we know if it needs to be persisted
             TypedQuery<Address> searchAddress

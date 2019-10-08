@@ -113,7 +113,8 @@ public class PersonResource {
     @Operation(summary = "Create new person", tags = {"person"},
             responses = {
                 @ApiResponse(responseCode = "200", description = "The newly created person"),
-                @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body")
+                @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body"),
+                @ApiResponse(responseCode = "409", description = "Person already exists")
             })
     public PersonDTO createPerson(PersonDTO personDTO) {
 
@@ -122,7 +123,7 @@ public class PersonResource {
                 || personDTO.getHobbies() == null || personDTO.getPhones() == null
                 || personDTO.getStreet() == null || personDTO.getStreet() == null
                 || personDTO.getZip() == null) {
-            throw new WebApplicationException("Not all required arguments included", 400);
+            throw new WebApplicationException("Not all arguments provided with the body", 400);
         }
         Person person = DTOMapper(personDTO);
         personDTO = FACADE.addPerson(person);
@@ -164,7 +165,7 @@ public class PersonResource {
     @Operation(summary = "Delete a person", tags = {"person"},
             responses = {
                 @ApiResponse(responseCode = "200", description = "The person has succesfully been deleted"),
-                @ApiResponse(responseCode = "400", description = "Person not found")
+                @ApiResponse(responseCode = "404", description = "Person not found")
             })
     public String deletePerson(@PathParam("id") int id) {
         try {

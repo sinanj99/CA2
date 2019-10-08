@@ -12,6 +12,7 @@ import entities.Hobby;
 import entities.Person;
 import entities.Phone;
 import entities.RenameMe;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +37,8 @@ public class PersonFacadeTest {
     private static EntityManagerFactory emf;
     private static PersonFacade facade;
     
-    Set<Phone> phone = new HashSet<>();
-    Set<Hobby> hobbies = new HashSet<>();
+    List<Phone> phone = new ArrayList();
+    List<Hobby> hobbies = new ArrayList();
     Address address = new Address(new CityInfo("3000", "Helsingør"), "Sigurdsvej", "Hjemme");
     
     {
@@ -86,16 +87,16 @@ public class PersonFacadeTest {
         EntityManager em = emf.createEntityManager();
         try {
             
-            Set<Phone> phone1 = new HashSet<>();
+            List<Phone> phone1 = new ArrayList();
             phone1.add(new Phone("22334455", "Hjemme nummer"));
             Address address1 = new Address(new CityInfo("3000", "Helsingør"), "Kongevejen", "Hjemme");
-            Set<Hobby> hobbies1 = new HashSet<>();
+            List<Hobby> hobbies1 = new ArrayList();
             hobbies1.add(new Hobby("Cykling", "Sport på 2 hjul"));
             
-            Set<Phone> phone2 = new HashSet<>();
+            List<Phone> phone2 = new ArrayList();
             phone1.add(new Phone("99887766", "Mobil"));
             Address address2 = new Address(new CityInfo("3070", "Snekkersten"), "Klyveren", "Ude");
-            Set<Hobby> hobbies2 = new HashSet<>();
+            List<Hobby> hobbies2 = new ArrayList();
             hobbies1.add(new Hobby("Sejlads", "Sport til havs"));
             
             
@@ -115,21 +116,14 @@ public class PersonFacadeTest {
     public void tearDown() {
 //        Remove any data after each test was run
     }
-
-    // TODO: Delete or change this method 
-    @Test
-    public void testGerPersonCount() {
-        assertEquals(3, facade.getPersonCount(), "Expects two rows in the database");
-    }
-    
     @Test
     public void testAddPerson(){
         Long count;
         
-        Set<Phone> phone1 = new HashSet<>();
+        List<Phone> phone1 = new ArrayList();
         phone1.add(new Phone("5555555", "Hjemme nummer"));
         Address address1 = new Address(new CityInfo("3000", "Helsingør"), "Rosenkildevej", "Hjemme");
-        Set<Hobby> hobbies1 = new HashSet<>();
+        List<Hobby> hobbies1 = new ArrayList();
         hobbies1.add(new Hobby("100m Løb", "Det skal gå hurtigt"));
         
         Person person = new Person("Ida@cphbusiness.dk", "Ida", "Larsen", phone1, address1, hobbies1);
@@ -159,6 +153,10 @@ public class PersonFacadeTest {
         allPersons = facade.getAllPerson();
         
         assertEquals(3, allPersons.size());
+    }
+    @Test
+    public void testGetPersonCount2() {
+        assertEquals(3, facade.getPersonCount(), "Expects two rows in the database");
     }
     
     @Test

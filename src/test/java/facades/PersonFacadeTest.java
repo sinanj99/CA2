@@ -47,7 +47,6 @@ public class PersonFacadeTest {
     }
     
     Person personUsedToGetID = new Person("Emil@cphbusiness.dk", "Emil", "Emilsen", phone, address, hobbies);
-           
     
     public PersonFacadeTest() {
     }
@@ -133,6 +132,31 @@ public class PersonFacadeTest {
         
         //if the person above got persisted, the person count should be equal to the count before it got persisted +1 
         assertEquals(count+1, facade.getPersonCount());
+    }
+    
+    @Test
+    public void testEditPerson()
+    {
+        List<Phone> phone_ = new ArrayList();
+        phone_.add(new Phone("22558899", "Hjemme nummer"));
+        Address address1 = new Address(new CityInfo("2200", "København NV"), "Tagensvej", "Hjemme");
+        List<Hobby> hobbies1 = new ArrayList();
+        hobbies1.add(new Hobby("Styrketræning", "Det skal være tungt"));
+        
+        Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
+        facade.addPerson(person);
+        
+        person.setFirstName("Abdi");
+        person.setLastName("Mahamad Yusuf Osman 2pac");
+        facade.editPerson(person);
+        
+        PersonDTO personActual = facade.getPersonById(person.getId().intValue());
+        
+        //Firstname
+        assertEquals("Abdi", personActual.getFirstName());
+        
+        //Lastname
+        assertEquals("Mahamad Yusuf Osman 2pac", personActual.getLastName());
     }
     
     @Test

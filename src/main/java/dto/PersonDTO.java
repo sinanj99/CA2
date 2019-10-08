@@ -1,12 +1,12 @@
 package dto;
 
-import entities.Address;
 import entities.Hobby;
 import entities.Person;
 import entities.Phone;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Schema(name = "Person")
@@ -19,8 +19,9 @@ public class PersonDTO {
     private String firstName;
     @Schema(required = true, example = "Mortensen")
     private String lastName;
-    @Schema(required = true, example = "{\n\"30232376\":\"private\"\n}")
-    private Map<String, String> phones = new HashMap();
+    @Schema(required = true, example = "[\"number:30232376,description:private\","
+            + "\"number:40455045,description:work\"]")
+    private List<String> phones = new ArrayList();
     @Schema(required = true, example = "Lyngbyvej 21")
     private String street;
     @Schema(example = "Home address")
@@ -28,23 +29,24 @@ public class PersonDTO {
     @Schema(required = true, example = "2800")
     private String zip;
     @Schema(required = true, example = "Lyngby")
-    private String city;
-    @Schema(required = true, example = "{\n\"coding\":\"writing code\"\n}")
-    private Map<String, String> hobbies = new HashMap();
+    private String city; 
+    @Schema(required = true, example = "[\"name:coding,description:writing code\","
+            + "\"name:beer,description:drinking beer\"]")
+    private List<String> hobbies = new ArrayList();
 
     public PersonDTO(Person p) {
         this.email = p.getEmail();
         this.firstName = p.getFirstName();
         this.lastName = p.getLastName();
         for(Phone phone : p.getPhone()) {
-            phones.put(phone.getNumber(), phone.getDescription());
+            phones.add("number:"+phone.getNumber()+",description:"+phone.getDescription());
         }
         this.street = p.getAddress().getStreet();
         this.streetInfo = p.getAddress().getInfo();
         this.zip = p.getAddress().getCityInfo().getZip();
         this.city = p.getAddress().getCityInfo().getCity();
         for(Hobby hobby : p.getHobbies()) {
-            hobbies.put(hobby.getName(), hobby.getDescription());
+            hobbies.add("name:"+hobby.getName()+",description:"+hobby.getDescription());
         }
     }
 
@@ -99,21 +101,19 @@ public class PersonDTO {
         this.streetInfo = streetInfo;
     }
 
-    
-
-    public Map<String, String> getPhones() {
+    public List<String> getPhones() {
         return phones;
     }
 
-    public void setPhones(Map<String, String> phones) {
+    public void setPhones(List<String> phones) {
         this.phones = phones;
     }
 
-    public Map<String, String> getHobbies() {
+    public List<String> getHobbies() {
         return hobbies;
     }
 
-    public void setHobbies(Map<String, String> hobbies) {
+    public void setHobbies(List<String> hobbies) {
         this.hobbies = hobbies;
     }
 

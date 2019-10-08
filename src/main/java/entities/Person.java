@@ -6,6 +6,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,17 +37,17 @@ public class Person implements Serializable {
     private String firstName;
     private String lastName;
     @OneToMany(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<Phone> phone = new HashSet(); 
+    private List<Phone> phone = new ArrayList(); 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Address address;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Set<Hobby> hobbies = new HashSet();
+    private List<Hobby> hobbies = new ArrayList();
 
     public Person() {
     }
 
     public Person(String email, String firstName, String lastName, 
-            Set<Phone> phone, Address address, Set<Hobby> hobbies) {
+            List<Phone> phone, Address address, List<Hobby> hobbies) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -112,14 +113,6 @@ public class Person implements Serializable {
         this.lastName = lastName;
     }
 
-    public Set<Phone> getPhone() {
-        return phone;
-    }
-
-    public void setPhone(Set<Phone> phone) {
-        this.phone = phone;
-    }
-
     public Address getAddress() {
         return address;
     }
@@ -128,12 +121,22 @@ public class Person implements Serializable {
         this.address = address;
     }
 
-    public Set<Hobby> getHobbies() {
+    public List<Phone> getPhone() {
+        return phone;
+    }
+
+    public void setPhone(List<Phone> phone) {
+        this.phone = phone;
+    }
+
+    public List<Hobby> getHobbies() {
         return hobbies;
     }
 
-    public void setHobbies(Set<Hobby> hobbies) {
+    public void setHobbies(List<Hobby> hobbies) {
         this.hobbies = hobbies;
     }
+
+    
     
 }

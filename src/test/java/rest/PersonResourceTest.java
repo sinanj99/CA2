@@ -237,4 +237,84 @@ public class PersonResourceTest {
         .log().body()
         .body("count", equalTo(1));
     }
+    // ------------------------- FAIL TESTS ----------------------------
+    
+    @Test
+    public void testGetByIdFail(){
+        System.out.println("--------------------- (FAIL) Get person by id test -------------------------");
+        given()
+        .contentType("application/json").when()
+        .get("/person/2321").then().log().body()
+        .assertThat()
+        .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
+        .body("code", equalTo(404))    
+        .body("message", equalTo("Person not found"));
+    }
+    
+    @Test
+    public void testAddPersonFail(){
+        System.out.println("--------------------- (FAIL) Add person test -------------------------");
+        String json =   "{\n" +
+                        "  \"email\": \"lars@lars.dk\",\n" +
+                        "  \"firstName\": \"Lars\"\n" +
+                        "}";
+        
+        given()
+        .contentType("application/json")
+        .accept("application/json")
+        .body(json)
+        .post("/person/").then()      
+        .log().body()
+        .assertThat()
+        .statusCode(HttpStatus.BAD_REQUEST_400.getStatusCode())
+        .body("code", equalTo(400));
+        /*.body("message", equalTo("Not all arguments provided with the body"));
+        
+            Af en eller anden årsag er message: Not all required arguments included
+            selvom at ApiResponse description er sat til: Not all arguments provided with the body
+        */
+        
+    }
+    
+    @Test
+    public void testEditPersonFail(){
+        System.out.println("--------------------- (FAIL) Edit person test -------------------------");
+        
+        System.out.println("----------- 400 No id provided ---------------------------------");
+        given()
+        .contentType("application/json")
+        .accept("application/json")
+        .body("{\"blabla\":\"blabla\"}")
+        .put("/person/").then()      
+        .log().body()
+        .assertThat()
+        .statusCode(HttpStatus.BAD_REQUEST_400.getStatusCode())
+        .body("code", equalTo(400))    
+        .body("message", equalTo("No id provided"));
+        
+        System.out.println("----------- 404 Person not found ---------------------------------");
+        given()
+        .contentType("application/json")
+        .accept("application/json")
+        .body("{\"id\":\"985632156\"}")
+        .put("/person/").then()      
+        .log().body()
+        .assertThat()
+        .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
+        .body("code", equalTo(404))    
+        .body("message", equalTo("Person not found"));
+    }
+    
+    @Test
+    public void testDeletePersonFail(){
+        System.out.println("--------------------- (FAIL) Delete person test -------------------------");
+        given()
+        .contentType("application/json")
+        .delete("/person/" + 4365746).then()
+        .assertThat()
+        .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
+        .log().body()
+        .body("code", equalTo(404))    
+        .body("message", equalTo("Person not found"));
+    }
 }

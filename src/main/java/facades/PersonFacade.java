@@ -98,20 +98,6 @@ public class PersonFacade implements IPersonFacade {
                     person.getHobbies().add(hobby);
                 }
             }
-            /*for each phone nr. (private nr. excluded) check if already exists, 
-            so we know if it needs to be persisted*/
-            TypedQuery<Phone> searchNumber;
-            for (Phone phone : person.getPhone()) {
-                searchNumber = em.createQuery("SELECT p FROM Phone p WHERE p.number = :number", Phone.class);
-                searchNumber.setParameter("number", phone.getNumber());
-                if (!searchNumber.getResultList().isEmpty()) {
-                    if (!phone.getDescription().equals("private")) {
-                        person.getPhone().remove(phone);
-                        phone = searchNumber.getSingleResult();
-                        person.getPhone().add(phone);
-                    }
-                }
-            }
             em.persist(person);
             em.getTransaction().commit();
         } finally {

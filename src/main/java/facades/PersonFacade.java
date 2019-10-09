@@ -10,6 +10,7 @@ import entities.Address;
 import entities.Hobby;
 import entities.Person;
 import entities.Phone;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -89,15 +90,19 @@ public class PersonFacade implements IPersonFacade {
             }
             //for each hobby, check if already exists, so we know if it needs to be persisted
             TypedQuery<Hobby> searchHobby;
+            List<Hobby> toAdd = new ArrayList();
+            List<Hobby> toRemove = new ArrayList();
             for (Hobby hobby : person.getHobbies()) {
                 searchHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class);
                 searchHobby.setParameter("name", hobby.getName());
                 if (!searchHobby.getResultList().isEmpty()) {
-                    person.getHobbies().remove(hobby);
+                    toRemove.add(hobby);
                     hobby = searchHobby.getSingleResult();
-                    person.getHobbies().add(hobby);
+                    toAdd.add(hobby);
                 }
             }
+            person.getHobbies().removeAll(toRemove);
+            person.getHobbies().addAll(toAdd);
             em.persist(person);
             em.getTransaction().commit();
         } finally {

@@ -63,22 +63,17 @@ public class PersonFacade implements IPersonFacade {
     @Override
     public PersonDTO addPerson(Person person) {
         EntityManager em = emf.createEntityManager();
-        //retrieve person's private phone number (unique identifier)
-        String privateNumber = "";
-        for (Phone p : person.getPhone()) {
-            if (p.getDescription().equals("private")) {
-                privateNumber = p.getNumber();
-            }
-        }
         try {
             em.getTransaction().begin();
 
-            //check if the retrieved private number already exists in db
-            TypedQuery<Phone> findNumber
-                    = em.createQuery("SELECT p FROM Phone p WHERE p.number = :number", Phone.class);
-            findNumber.setParameter("number", privateNumber);
-            if (!findNumber.getResultList().isEmpty()) {
-                throw new WebApplicationException("Person already exists", 409);
+            //for each hobby, check if already exists, so we know if it needs to be persisted
+            TypedQuery<Phone> searchPhone;
+            for (Phone phone : person.getPhone()) {
+                searchPhone = em.createQuery("SELECT p.person FROM Phone p WHERE p.number = :number", Phone.class);
+                searchPhone.setParameter("number", phone.getNumber());
+                if (!searchPhone.getResultList().isEmpty()) {
+                    throw new WebApplicationException("Person already exists",409);
+                }
             }
             //check if address already exists, so we know if it needs to be persisted
             TypedQuery<Address> searchAddress

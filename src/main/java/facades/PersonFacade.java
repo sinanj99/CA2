@@ -66,36 +66,15 @@ public class PersonFacade implements IPersonFacade {
         try {
             em.getTransaction().begin();
 
-            //for each hobby, check if already exists, so we know if it needs to be persisted
-            TypedQuery<Phone> searchPhone;
-            for (Phone phone : person.getPhone()) {
-                searchPhone = em.createQuery("SELECT p.person FROM Phone p WHERE p.number = :number", Phone.class);
-                searchPhone.setParameter("number", phone.getNumber());
-                if (!searchPhone.getResultList().isEmpty()) {
-                    throw new WebApplicationException("Person already exists",409);
-                }
-            }
+            //for each phone, check if already exists, so we know if it needs to be persisted
+            checkPhone(person,em);
             //check if address already exists, so we know if it needs to be persisted
-            TypedQuery<Address> searchAddress
-                    = em.createQuery("SELECT a FROM Address a WHERE a.street = :street", Address.class);
-            searchAddress.setParameter("street", person.getAddress().getStreet());
-            if (!searchAddress.getResultList().isEmpty()) {
-                Address a = searchAddress.getSingleResult();
-                person.setAddress(a);
-            }
+            checkAddress(person,em);
             //for each hobby, check if already exists, so we know if it needs to be persisted
-            TypedQuery<Hobby> searchHobby;
             List<Hobby> toAdd = new ArrayList();
             List<Hobby> toRemove = new ArrayList();
-            for (Hobby hobby : person.getHobbies()) {
-                searchHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class);
-                searchHobby.setParameter("name", hobby.getName());
-                if (!searchHobby.getResultList().isEmpty()) {
-                    toRemove.add(hobby);
-                    hobby = searchHobby.getSingleResult();
-                    toAdd.add(hobby);
-                }
-            }
+            checkHobby(person,toAdd,toRemove, em);
+            
             person.getHobbies().removeAll(toRemove);
             person.getHobbies().addAll(toAdd);
             em.persist(person);
@@ -213,5 +192,37 @@ public class PersonFacade implements IPersonFacade {
         } finally {
             em.close();
         }
+    }
+    private void checkPhone(Person person, EntityManager em) {
+        //for each phone, check if already exists, so we know if it needs to be persisted
+            TypedQuery<Phone> searchPhone;
+            for (Phone phone : person.getPhone()) {
+                searchPhone = em.createQuery("SELECT p.person FROM Phone p WHERE p.number = :number", Phone.class);
+                searchPhone.setParameter("number", phone.getNumber());
+                if (!searchPhone.getResultList().isEmpty()) {
+                    throw new WebApplicationException("Person already exists",409);
+                }
+            }
+    }
+    private void checkAddress(Person person, EntityManager em) {
+        TypedQuery<Address> searchAddress
+                    = em.createQuery("SELECT a FROM Address a WHERE a.street = :street", Address.class);
+            searchAddress.setParameter("street", person.getAddress().getStreet());
+            if (!searchAddress.getResultList().isEmpty()) {
+                Address a = searchAddress.getSingleResult();
+                person.setAddress(a);
+            }
+    }
+    private void checkHobby(Person person, List<Hobby>toAdd, List<Hobby>toRemove, EntityManager em) {
+        TypedQuery<Hobby> searchHobby;
+            for (Hobby hobby : person.getHobbies()) {
+                searchHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class);
+                searchHobby.setParameter("name", hobby.getName());
+                if (!searchHobby.getResultList().isEmpty()) {
+                    toRemove.add(hobby);
+                    hobby = searchHobby.getSingleResult();
+                    toAdd.add(hobby);
+                }
+            }
     }
 }

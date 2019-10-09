@@ -19,8 +19,7 @@ public class PersonDTO {
     private String firstName;
     @Schema(required = true, example = "Mortensen")
     private String lastName;
-    @Schema(required = true, example = "[\"number:30232376,description:private\","
-            + "\"number:40455045,description:work\"]")
+    @Schema(required = true, example = "[{\"number\":\"30232376\",\"description\":\"private\"},{\"number\":\"10101010\",\"description\":\"work\"}]")
     private List<String> phones = new ArrayList();
     @Schema(required = true, example = "Lyngbyvej 21")
     private String street;
@@ -30,8 +29,7 @@ public class PersonDTO {
     private String zip;
     @Schema(required = true, example = "Lyngby")
     private String city; 
-    @Schema(required = true, example = "[\"name:coding,description:writing code\","
-            + "\"name:beer,description:drinking beer\"]")
+    @Schema(required = true, example = "[{\"name\":\"coding\",\"description\":\"writing code\"},{\"name\":\"beer\",\"description\":\"drinking beer\"}]")
     private List<String> hobbies = new ArrayList();
 
     public PersonDTO(Person p) {

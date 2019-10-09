@@ -177,7 +177,6 @@ public class PersonResource {
     }
     private Person DTOMapper(PersonDTO personDTO) {
         
-        //map DTO to Person entity
         CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
         Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
         List<Hobby> hobbies = new ArrayList();

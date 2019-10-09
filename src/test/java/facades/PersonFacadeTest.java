@@ -193,4 +193,14 @@ public class PersonFacadeTest {
         }
     }
     
+    
+//    @Test
+//    public void testGetPersonByPhone(){
+//        for(Phone p : phone){
+//            PersonDTO personWithThePhoneNumber = facade.getPersonByPhone(p);
+//            
+//            assertEquals(p.getNumber(), personWithThePhoneNumber.getPhones().get(0).split(",")[0].split(":")[1]);
+//        }
+//    }
+    
 }

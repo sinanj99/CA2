@@ -203,6 +203,19 @@ public class PersonFacade implements IPersonFacade {
 
     @Override
     public PersonDTO getPersonByPhone(Phone phone) {
+//        EntityManager em = emf.createEntityManager();
+//        
+//        try{
+//            TypedQuery<Person> query = 
+//                       em.createQuery("Select person from Person person where person.phone.number = :number",Person.class);
+//            query.setParameter("number", phone.getNumber());
+//            
+//            return new PersonDTO(query.getSingleResult());
+//        }
+//        finally{
+//            em.close();
+//        }
+
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -125,7 +125,7 @@ public class PersonResource {
                 || personDTO.getZip() == null) {
             throw new WebApplicationException("Not all arguments provided with the body", 400);
         }
-        Person person = DTOMapper(personDTO);
+        Person person = personDTO.DTOMapper(personDTO);
         personDTO = FACADE.addPerson(person);
         
         return personDTO;
@@ -146,7 +146,7 @@ public class PersonResource {
         if (personDTO.getId() == null) {
             throw new WebApplicationException("No id provided", 400);
         } 
-        Person person = DTOMapper(personDTO);
+        Person person = personDTO.DTOMapper(personDTO);
         person.setId(personDTO.getId());
 
         try {
@@ -174,30 +174,5 @@ public class PersonResource {
             throw new WebApplicationException("Person not found", 404);
         }
         return "{\"status\": \"deleted\"}";
-    }
-    private Person DTOMapper(PersonDTO personDTO) {
-        
-        CityInfo cityInfo = new CityInfo(personDTO.getZip(), personDTO.getCity());
-        Address address = new Address(cityInfo, personDTO.getStreet(), personDTO.getStreetInfo());
-        List<Hobby> hobbies = new ArrayList();
-        List<Phone> phones = new ArrayList();
-        //syntax for hobbies is: "name:value,description:value"
-        for (String hobby : personDTO.getHobbies()) {
-            hobbies.add(new Hobby(hobby.split(",")[0].split(":")[1],
-                    hobby.split(",")[1].split(":")[1]));
-        }
-        //syntax for phones is: "number:value,description:value"
-        for (String phone : personDTO.getPhones()) {
-            phones.add(new Phone(phone.split(",")[0].split(":")[1],
-                    phone.split(",")[1].split(":")[1]));
-        }
-        Person p = new Person(personDTO.getEmail(), personDTO.getFirstName(),
-                personDTO.getLastName(), phones, address, hobbies);
-        
-        for(Phone phone : phones) {
-            phone.setPerson(p);
-        }
-        return p;
-        
     }
 }

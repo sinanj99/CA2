@@ -19,7 +19,7 @@ public class PersonDTO {
     private String firstName;
     @Schema(required = true, example = "Mortensen")
     private String lastName;
-    @Schema(required = true, example = "[{\"number\":\"30232376\",\"description\":\"private\"},{\"number\":\"10101010\",\"description\":\"work\"}]")
+    @Schema(required = true, example = "[\"number:30232376,description:private\",\"number:12121212,description:work\"]")
     private List<String> phones = new ArrayList();
     @Schema(required = true, example = "Lyngbyvej 21")
     private String street;
@@ -29,7 +29,7 @@ public class PersonDTO {
     private String zip;
     @Schema(required = true, example = "Lyngby")
     private String city; 
-    @Schema(required = true, example = "[{\"name\":\"coding\",\"description\":\"writing code\"},{\"name\":\"beer\",\"description\":\"drinking beer\"}]")
+    @Schema(required = true, example = "[\"name:coding,description:writing code\",\"name:beer,description:drinking beer\"]")
     private List<String> hobbies = new ArrayList();
 
     public PersonDTO(Person p) {
@@ -37,14 +37,14 @@ public class PersonDTO {
         this.firstName = p.getFirstName();
         this.lastName = p.getLastName();
         for(Phone phone : p.getPhone()) {
-            phones.add("number:"+phone.getNumber()+",description:"+phone.getDescription());
+            phones.add("\"number:"+phone.getNumber()+",description:"+phone.getDescription()+"\"");
         }
         this.street = p.getAddress().getStreet();
         this.streetInfo = p.getAddress().getInfo();
         this.zip = p.getAddress().getCityInfo().getZip();
         this.city = p.getAddress().getCityInfo().getCity();
         for(Hobby hobby : p.getHobbies()) {
-            hobbies.add("name:"+hobby.getName()+",description:"+hobby.getDescription());
+            phones.add("\"name:"+hobby.getName()+",description:"+hobby.getDescription()+"\"");
         }
     }
 

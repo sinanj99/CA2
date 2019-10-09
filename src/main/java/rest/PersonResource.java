@@ -116,7 +116,7 @@ public class PersonResource {
                 @ApiResponse(responseCode = "400", description = "Not all arguments provided with the body"),
                 @ApiResponse(responseCode = "409", description = "Person already exists")
             })
-    public PersonDTO createPerson(PersonDTO personDTO) {
+    public PersonDTO addPerson(PersonDTO personDTO) {
 
         //check for missing input
         if (personDTO.getFirstName() == null || personDTO.getLastName() == null

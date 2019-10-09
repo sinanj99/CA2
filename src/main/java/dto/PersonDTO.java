@@ -37,14 +37,14 @@ public class PersonDTO {
         this.firstName = p.getFirstName();
         this.lastName = p.getLastName();
         for(Phone phone : p.getPhone()) {
-            phones.add("\"number:"+phone.getNumber()+",description:"+phone.getDescription()+"\"");
+            phones.add("number:"+phone.getNumber()+",description:"+phone.getDescription());
         }
         this.street = p.getAddress().getStreet();
         this.streetInfo = p.getAddress().getInfo();
         this.zip = p.getAddress().getCityInfo().getZip();
         this.city = p.getAddress().getCityInfo().getCity();
         for(Hobby hobby : p.getHobbies()) {
-            phones.add("\"name:"+hobby.getName()+",description:"+hobby.getDescription()+"\"");
+            hobbies.add("name:"+hobby.getName()+",description:"+hobby.getDescription());
         }
     }
 

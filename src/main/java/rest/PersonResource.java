@@ -192,8 +192,13 @@ public class PersonResource {
             phones.add(new Phone(phone.split(",")[0].split(":")[1],
                     phone.split(",")[1].split(":")[1]));
         }
-        return new Person(personDTO.getEmail(), personDTO.getFirstName(),
+        Person p = new Person(personDTO.getEmail(), personDTO.getFirstName(),
                 personDTO.getLastName(), phones, address, hobbies);
+        
+        for(Phone phone : phones) {
+            phone.setPerson(p);
+        }
+        return p;
         
     }
 }

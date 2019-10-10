@@ -78,9 +78,9 @@ public class PersonResource {
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
                 @ApiResponse(responseCode = "200", description = "The Requested Person"),
                 @ApiResponse(responseCode = "404", description = "Person not found")})
-    
+
     @GET
-    @Path("{id}")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public PersonDTO getPerson(@PathParam("id") int id) {
         PersonDTO p;
@@ -91,8 +91,26 @@ public class PersonResource {
         }
         return p;
     }
+
+    @Operation(summary = "Get persons by city",
+            tags = {"person, city"},
+            responses = {
+                @ApiResponse(
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
+                @ApiResponse(responseCode = "200", description = "The requested persons"),
+                @ApiResponse(responseCode = "404", description = "Person not found")})
     
-    
+    @GET
+    @Path("city/{city}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<PersonDTO> getPersonsByCity(@PathParam("city") String city) {
+        try {
+            return FACADE.getPersonsByCity(city);
+        } catch (NullPointerException e) {
+            throw new WebApplicationException("Person not found", 404);
+        }
+    }
+
     @Operation(summary = "Get person count",
             tags = {"person"},
             responses = {
@@ -103,9 +121,9 @@ public class PersonResource {
     @Path("count")
     @Produces(MediaType.APPLICATION_JSON)
     public String getPersonCount() {
-        return "{\"count\""+":"+FACADE.getPersonCount()+"}";
+        return "{\"count\"" + ":" + FACADE.getPersonCount() + "}";
     }
-    
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -126,9 +144,7 @@ public class PersonResource {
             throw new WebApplicationException("Not all arguments provided with the body", 400);
         }
         Person person = personDTO.DTOMapper(personDTO);
-        personDTO = FACADE.addPerson(person);
-        
-        return personDTO;
+        return FACADE.addPerson(person);
     }
 
     @PUT
@@ -145,7 +161,7 @@ public class PersonResource {
 
         if (personDTO.getId() == null) {
             throw new WebApplicationException("No id provided", 400);
-        } 
+        }
         Person person = personDTO.DTOMapper(personDTO);
         person.setId(personDTO.getId());
 

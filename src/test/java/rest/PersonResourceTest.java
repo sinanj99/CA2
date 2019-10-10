@@ -22,6 +22,7 @@ import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,25 +36,27 @@ public class PersonResourceTest {
 
     private static final int SERVER_PORT = 7777;
     private static final String SERVER_URL = "http://localhost/api";
-    
+
     static final URI BASE_URI = UriBuilder.fromUri(SERVER_URL).port(SERVER_PORT).build();
     private static HttpServer httpServer;
     private static EntityManagerFactory emf;
-    
+
     // Person 1 info:
     Address p_Address = new Address(new CityInfo("2200", "København Ø"), "Tagensvej", "Hjem");
     List<Phone> p_Phones = new ArrayList();
-    List<Hobby> p_hobbies = new ArrayList(); 
+    List<Hobby> p_hobbies = new ArrayList();
+
     {
         p_Phones.add(new Phone("12345678", "Hjem"));
         p_hobbies.add(new Hobby("Eating", "I love food!"));
     }
     Person person = new Person("michael@cphbusiness.dk", "Michael", "Pedersen", p_Phones, p_Address, p_hobbies);
-    
+
     // Person 2 info:
     Address p2_Address = new Address(new CityInfo("2100", "København Ø"), "Victor Bendix Gade", "Hjem");
     List<Phone> p2_Phones = new ArrayList();
-    List<Hobby> p2_hobbies = new ArrayList(); 
+    List<Hobby> p2_hobbies = new ArrayList();
+
     {
         p2_Phones.add(new Phone("87654321", "Hjem"));
         p2_hobbies.add(new Hobby("Eating", "I love food!"));
@@ -70,22 +73,22 @@ public class PersonResourceTest {
         //This method must be called before you request the EntityManagerFactory
         EMF_Creator.startREST_TestWithDB();
         emf = EMF_Creator.createEntityManagerFactory(DbSelector.TEST, Strategy.DROP_AND_CREATE);
-        
+
         httpServer = startServer();
         //Setup RestAssured
         RestAssured.baseURI = SERVER_URL;
         RestAssured.port = SERVER_PORT;
         RestAssured.defaultParser = Parser.JSON;
     }
-    
+
     @AfterAll
-    public static void closeTestServer(){
+    public static void closeTestServer() {
         //System.in.read();
-         //Don't forget this, if you called its counterpart in @BeforeAll
-         EMF_Creator.endREST_TestWithDB();
-         httpServer.shutdownNow();
+        //Don't forget this, if you called its counterpart in @BeforeAll
+        EMF_Creator.endREST_TestWithDB();
+        httpServer.shutdownNow();
     }
-    
+
     // Setup the DataBase (used by the test-server and this test) in a known state BEFORE EACH TEST
     //TODO -- Make sure to change the EntityClass used below to use YOUR OWN (renamed) Entity class
     @BeforeEach
@@ -93,15 +96,16 @@ public class PersonResourceTest {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
+            em.createNamedQuery("Phone.deleteAllRows").executeUpdate();
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
             em.persist(person);
             em.persist(person2);
             em.getTransaction().commit();
-        } finally { 
+        } finally {
             em.close();
         }
     }
-    
+
 //    @Test
 //    public void testGetPersonCount(){
 //        given()
@@ -112,79 +116,91 @@ public class PersonResourceTest {
 //        .log().body()
 //        .body("count", equalTo(2));
 //    }
-    
     @Test
-    public void testGetById(){
+    public void testGetById() {
         System.out.println("--------------------- Get person by id test -------------------------");
         System.out.println("--------------------- Person 1 --------------------------------------");
         //Person 1
         given()
-        .contentType("application/json")
-        .get("/person/" + person.getId()).then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .log().body()
-        .body("firstName", equalTo(person.getFirstName()))
-        .body("lastName", equalTo(person.getLastName())) 
-        .body("email", equalTo(person.getEmail()));
-        
+                .contentType("application/json")
+                .get("/person/" + person.getId()).then()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .log().body()
+                .body("firstName", equalTo(person.getFirstName()))
+                .body("lastName", equalTo(person.getLastName()))
+                .body("email", equalTo(person.getEmail()));
+
         System.out.println("--------------------- Person 2 --------------------------------------");
         //Person 2
         given()
-        .contentType("application/json")
-        .get("/person/" + person2.getId()).then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .log().body()
-        .body("firstName", equalTo(person2.getFirstName()))
-        .body("lastName", equalTo(person2.getLastName())) 
-        .body("email", equalTo(person2.getEmail()));
+                .contentType("application/json")
+                .get("/person/" + person2.getId()).then()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .log().body()
+                .body("firstName", equalTo(person2.getFirstName()))
+                .body("lastName", equalTo(person2.getLastName()))
+                .body("email", equalTo(person2.getEmail()));
     }
-    
+
     @Test
-    public void testAddPerson(){
-        System.out.println("--------------------- Add person test -------------------------");
-        String json =   "{\n" +
-                        "  \"id\": 0,\n" +
-                        "  \"email\": \"mathias@cphbusiness.dk\",\n" +
-                        "  \"firstName\": \"Mathias\",\n" +
-                        "  \"lastName\": \"Stenberg\",\n" +
-                        "  \"phones\": [\n" +
-                        "    \"number:30232376,description:private\",\n" +
-                        "    \"number:40455045,description:work\"\n" +
-                        "  ],\n" +
-                        "  \"street\": \"Lyngbyvej 21\",\n" +
-                        "  \"streetInfo\": \"Home address\",\n" +
-                        "  \"zip\": \"2800\",\n" +
-                        "  \"city\": \"Lyngby\",\n" +
-                        "  \"hobbies\": [\n" +
-                        "    \"name:coding,description:writing code\",\n" +
-                        "    \"name:beer,description:drinking beer\"\n" +
-                        "  ]\n" +
-                        "}";
-        
+    public void testGetPersonsByCity() {
+        System.out.println("--------------------- Get persons by city test -------------------------");
+        //City 1
         given()
-        .contentType("application/json")
-        .accept("application/json")
-        .body(json)
-        .post("/person/").then()      
-        .log().body()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .body("firstName", equalTo("Mathias"))
-        .body("lastName", equalTo("Stenberg")) 
-        .body("email", equalTo("mathias@cphbusiness.dk"));
-        
-        given()
-        .contentType("application/json")
-        .get("/person/count").then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .log().body()
-        .body("count", equalTo(3));
-        
+                .contentType("application/json")
+                .get("/person/city/København Ø").then()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .log().body()
+                .body("size()", is(2));
     }
-    
+
+    @Test
+    public void testAddPerson() {
+        System.out.println("--------------------- Add person test -------------------------");
+        String json = "{\n"
+                + "  \"id\": 0,\n"
+                + "  \"email\": \"mathias@cphbusiness.dk\",\n"
+                + "  \"firstName\": \"Mathias\",\n"
+                + "  \"lastName\": \"Stenberg\",\n"
+                + "  \"phones\": [\n"
+                + "    \"number:30232376,description:private\",\n"
+                + "    \"number:40455045,description:work\"\n"
+                + "  ],\n"
+                + "  \"street\": \"Lyngbyvej 21\",\n"
+                + "  \"streetInfo\": \"Home address\",\n"
+                + "  \"zip\": \"2800\",\n"
+                + "  \"city\": \"Lyngby\",\n"
+                + "  \"hobbies\": [\n"
+                + "    \"name:coding,description:writing code\",\n"
+                + "    \"name:beer,description:drinking beer\"\n"
+                + "  ]\n"
+                + "}";
+
+        given()
+                .contentType("application/json")
+                .accept("application/json")
+                .body(json)
+                .post("/person/").then()
+                .log().body()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .body("firstName", equalTo("Mathias"))
+                .body("lastName", equalTo("Stenberg"))
+                .body("email", equalTo("mathias@cphbusiness.dk"));
+
+        given()
+                .contentType("application/json")
+                .get("/person/count").then()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .log().body()
+                .body("count", equalTo(3));
+
+    }
+
 //    @Test
 //    public void testEditPerson(){
 //        System.out.println("--------------------- Edit person test -------------------------");
@@ -219,90 +235,91 @@ public class PersonResourceTest {
 //    }
 //    
     @Test
-    public void testDeletePerson(){
+    public void testDeletePerson() {
         System.out.println("--------------------- Delete person test -------------------------");
         given()
-        .contentType("application/json")
-        .delete("/person/" + person.getId()).then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .log().body()
-        .body("status", equalTo("deleted"));
-        
+                .contentType("application/json")
+                .delete("/person/" + person.getId()).then()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .log().body()
+                .body("status", equalTo("deleted"));
+
         given()
-        .contentType("application/json")
-        .get("/person/count").then()
-        .assertThat()
-        .statusCode(HttpStatus.OK_200.getStatusCode())
-        .log().body()
-        .body("count", equalTo(1));
+                .contentType("application/json")
+                .get("/person/count").then()
+                .assertThat()
+                .statusCode(HttpStatus.OK_200.getStatusCode())
+                .log().body()
+                .body("count", equalTo(1));
     }
     // ------------------------- FAIL TESTS ----------------------------
-    
+
     @Test
-    public void testGetByIdFail(){
+    public void testGetByIdFail() {
         System.out.println("--------------------- (FAIL) Get person by id test -------------------------");
         given()
-        .contentType("application/json").when()
-        .get("/person/2321").then().log().body()
-        .assertThat()
-        .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
-        .body("code", equalTo(404))    
-        .body("message", equalTo("Person not found"));
+                .contentType("application/json").when()
+                .get("/person/2321").then().log().body()
+                .assertThat()
+                .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
+                .body("code", equalTo(404))
+                .body("message", equalTo("Person not found"));
     }
-    
+
     @Test
-    public void testAddPersonFail(){
+    public void testAddPersonFail() {
         System.out.println("--------------------- (FAIL) Add person test -------------------------");
-        String json =   "{\n" +
-                        "  \"email\": \"lars@lars.dk\",\n" +
-                        "  \"firstName\": \"Lars\"\n" +
-                        "}";
-        
+        String json = "{\n"
+                + "  \"email\": \"lars@lars.dk\",\n"
+                + "  \"firstName\": \"Lars\"\n"
+                + "}";
+
         given()
-        .contentType("application/json")
-        .accept("application/json")
-        .body(json)
-        .post("/person/").then()      
-        .log().body()
-        .assertThat()
-        .statusCode(HttpStatus.BAD_REQUEST_400.getStatusCode())
-        .body("code", equalTo(400))
-        .body("message", equalTo("Not all arguments provided with the body"));
+                .contentType("application/json")
+                .accept("application/json")
+                .body(json)
+                .post("/person/").then()
+                .log().body()
+                .assertThat()
+                .statusCode(HttpStatus.BAD_REQUEST_400.getStatusCode())
+                .body("code", equalTo(400))
+                .body("message", equalTo("Not all arguments provided with the body"));
     }
+
     @Test
-    public void testAddPersonFail2(){
+    public void testAddPersonFail2() {
         System.out.println("--------------------- (FAIL2) Add person test -------------------------");
-        String json =   "{\n" +
-                        "  \"email\": \"mathias@cphbusiness.dk\",\n" +
-                        "  \"firstName\": \"Mathias\",\n" +
-                        "  \"lastName\": \"Stenberg\",\n" +
-                        "  \"phones\": [\n" +
-                        "    \"number:12345678,description:private\",\n" +
-                        "    \"number:40455045,description:work\"\n" +
-                        "  ],\n" +
-                        "  \"street\": \"Lyngbyvej 21\",\n" +
-                        "  \"streetInfo\": \"Home address\",\n" +
-                        "  \"zip\": \"2800\",\n" +
-                        "  \"city\": \"Lyngby\",\n" +
-                        "  \"hobbies\": [\n" +
-                        "    \"name:coding,description:writing code\",\n" +
-                        "    \"name:beer,description:drinking beer\"\n" +
-                        "  ]\n" +
-                        "}";
-        
+        String json = "{\n"
+                + "  \"email\": \"mathias@cphbusiness.dk\",\n"
+                + "  \"firstName\": \"Mathias\",\n"
+                + "  \"lastName\": \"Stenberg\",\n"
+                + "  \"phones\": [\n"
+                + "    \"number:12345678,description:private\",\n"
+                + "    \"number:40455045,description:work\"\n"
+                + "  ],\n"
+                + "  \"street\": \"Lyngbyvej 21\",\n"
+                + "  \"streetInfo\": \"Home address\",\n"
+                + "  \"zip\": \"2800\",\n"
+                + "  \"city\": \"Lyngby\",\n"
+                + "  \"hobbies\": [\n"
+                + "    \"name:coding,description:writing code\",\n"
+                + "    \"name:beer,description:drinking beer\"\n"
+                + "  ]\n"
+                + "}";
+
         given()
-        .contentType("application/json")
-        .accept("application/json")
-        .body(json)
-        .post("/person/").then()      
-        .log().body()
-        .assertThat()
-        .statusCode(HttpStatus.CONFLICT_409.getStatusCode())
-        .body("code", equalTo(409))
-        .body("message", equalTo("Person already exists"));
+                .contentType("application/json")
+                .accept("application/json")
+                .body(json)
+                .post("/person/").then()
+                .log().body()
+                .assertThat()
+                .statusCode(HttpStatus.CONFLICT_409.getStatusCode())
+                .body("code", equalTo(409))
+                .body("message", equalTo("Person already exists"));
     }
-    
+
 //    @Test
 //    public void testEditPersonFail(){
 //        System.out.println("--------------------- (FAIL) Edit person test -------------------------");
@@ -333,15 +350,15 @@ public class PersonResourceTest {
 //    }
 //    
     @Test
-    public void testDeletePersonFail(){
+    public void testDeletePersonFail() {
         System.out.println("--------------------- (FAIL) Delete person test -------------------------");
         given()
-        .contentType("application/json")
-        .delete("/person/" + 4365746).then()
-        .assertThat()
-        .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
-        .log().body()
-        .body("code", equalTo(404))    
-        .body("message", equalTo("Person not found"));
+                .contentType("application/json")
+                .delete("/person/" + 4365746).then()
+                .assertThat()
+                .statusCode(HttpStatus.NOT_FOUND_404.getStatusCode())
+                .log().body()
+                .body("code", equalTo(404))
+                .body("message", equalTo("Person not found"));
     }
 }

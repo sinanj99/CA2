@@ -31,23 +31,22 @@ import utils.EMF_Creator;
  *
  * @author Kasper Jeppesen
  */
-
 public class PersonFacadeTest {
-    
+
     private static EntityManagerFactory emf;
     private static PersonFacade facade;
-    
+
     List<Phone> phone = new ArrayList();
     List<Hobby> hobbies = new ArrayList();
     Address address = new Address(new CityInfo("3000", "Helsingør"), "Sigurdsvej", "Hjemme");
-    
+
     {
         phone.add(new Phone("55661122", "Hjemme nummer"));
         hobbies.add(new Hobby("Klatring", "Det går op af"));
     }
-    
+
     Person personUsedToGetID = new Person("Emil@cphbusiness.dk", "Emil", "Emilsen", phone, address, hobbies);
-    
+
     public PersonFacadeTest() {
     }
 
@@ -70,8 +69,8 @@ public class PersonFacadeTest {
      */
     @BeforeAll
     public static void setUpClassV2() {
-       emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.TEST,EMF_Creator.Strategy.DROP_AND_CREATE);
-       facade = PersonFacade.getPersonFacade(emf);
+        emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.TEST, EMF_Creator.Strategy.DROP_AND_CREATE);
+        facade = PersonFacade.getPersonFacade(emf);
     }
 
     @AfterAll
@@ -85,28 +84,39 @@ public class PersonFacadeTest {
     public void setUp() {
         EntityManager em = emf.createEntityManager();
         try {
-            
+
             List<Phone> phone1 = new ArrayList();
             phone1.add(new Phone("22334455", "Hjemme nummer"));
             Address address1 = new Address(new CityInfo("3000", "Helsingør"), "Kongevejen", "Hjemme");
             List<Hobby> hobbies1 = new ArrayList();
             hobbies1.add(new Hobby("Cykling", "Sport på 2 hjul"));
+            Person p1 = new Person("Tom@cphbusiness.dk", "Tom", "Jensen", phone1, address1, hobbies1);
             
+
             List<Phone> phone2 = new ArrayList();
             phone2.add(new Phone("99887766", "Mobil"));
             Address address2 = new Address(new CityInfo("3070", "Snekkersten"), "Klyveren", "Ude");
             List<Hobby> hobbies2 = new ArrayList();
             hobbies2.add(new Hobby("Sejlads", "Sport til havs"));
-            
-            
+            Person p2 = new Person("Kim@cphbusiness.dk", "Kim", "Kimsen", phone2, address2, hobbies2);
+
             em.getTransaction().begin();
+            em.createNamedQuery("Phone.deleteAllRows").executeUpdate();
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
             em.createNamedQuery("Address.deleteAllRows").executeUpdate();
             em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
-            em.createNamedQuery("Phone.deleteAllRows").executeUpdate();
             em.createNamedQuery("Hobby.deleteAllRows").executeUpdate();
-            em.persist(new Person("Tom@cphbusiness.dk", "Tom", "Jensen", phone1, address1, hobbies1));
-            em.persist(new Person("Kim@cphbusiness.dk", "Kim", "Kimsen", phone2, address2, hobbies2));
+            for (Phone p : phone) {
+                p.setPerson(personUsedToGetID);
+            }
+            for (Phone p : phone1) {
+                p.setPerson(p1);
+            }
+            for (Phone p : phone2) {
+                p.setPerson(p2);
+            }
+            em.persist(p1);
+            em.persist(p2);
             em.persist(personUsedToGetID);
 
             em.getTransaction().commit();
@@ -119,83 +129,83 @@ public class PersonFacadeTest {
     public void tearDown() {
 //        Remove any data after each test was run
     }
+
     @Test
-    public void testAddPerson(){
+    public void testAddPerson() {
         Long count;
-        
+
         List<Phone> phone1 = new ArrayList();
         phone1.add(new Phone("5555555", "Hjemme nummer"));
         Address address1 = new Address(new CityInfo("3000", "Helsingør"), "Rosenkildevej", "Hjemme");
         List<Hobby> hobbies1 = new ArrayList();
         hobbies1.add(new Hobby("100m Løb", "Det skal gå hurtigt"));
-        
+
         Person person = new Person("Ida@cphbusiness.dk", "Ida", "Larsen", phone1, address1, hobbies1);
-        
+
         count = facade.getPersonCount();
         facade.addPerson(person);
-        
+
         //if the person above got persisted, the person count should be equal to the count before it got persisted +1 
-        assertEquals(count+1, facade.getPersonCount());
+        assertEquals(count + 1, facade.getPersonCount());
     }
-    
+
     @Test
-    public void testEditPerson()
-    {
+    public void testEditPerson() {
         List<Phone> phone_ = new ArrayList();
         phone_.add(new Phone("22558899", "Hjemme nummer"));
         Address address1 = new Address(new CityInfo("2200", "København NV"), "Tagensvej", "Hjemme");
         List<Hobby> hobbies1 = new ArrayList();
         hobbies1.add(new Hobby("Styrketræning", "Det skal være tungt"));
-        
+
         Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
         facade.addPerson(person);
-        
+
         person.setFirstName("Abdi");
         person.setLastName("Mahamad Yusuf Osman 2pac");
         facade.editPerson(person);
-        
+
         PersonDTO personActual = facade.getPersonById(person.getId().intValue());
-        
+
         //Firstname
         assertEquals("Abdi", personActual.getFirstName());
-        
+
         //Lastname
         assertEquals("Mahamad Yusuf Osman 2pac", personActual.getLastName());
     }
-    
+
     @Test
-    public void testDeletePerson()
-    {
+    public void testDeletePerson() {
         Long count;
-        
+
         count = facade.getPersonCount();
-        facade.deletePerson( personUsedToGetID.getId().intValue());
-        
-        assertEquals(count-1, facade.getPersonCount());
+        facade.deletePerson(personUsedToGetID.getId().intValue());
+
+        assertEquals(count - 1, facade.getPersonCount());
     }
-    
+
     @Test
-    public void testGetAllPersons(){
+    public void testGetAllPersons() {
         List<PersonDTO> allPersons;
-        
+
         allPersons = facade.getAllPerson();
-        
+
         assertEquals(3, allPersons.size());
     }
+
     @Test
     public void testGetPersonCount2() {
         assertEquals(3, facade.getPersonCount(), "Expects two rows in the database");
     }
-    
+
     @Test
-    public void testGetPersonsByCity()
-    {
+    public void testGetPersonsByCity() {
         List<PersonDTO> allPersonsInTheCity = facade.getPersonsByCity("Helsingør");
-        
-        for(PersonDTO person : allPersonsInTheCity){
+
+        for (PersonDTO person : allPersonsInTheCity) {
             assertEquals("Helsingør", person.getCity());
         }
     }
+
     @Test
     public void testGetPersonsByHobby() {
         List<Phone> phone_ = new ArrayList();
@@ -203,12 +213,14 @@ public class PersonFacadeTest {
         Address address1 = new Address(new CityInfo("2200", "København NV"), "Tagensvej", "Hjemme");
         List<Hobby> hobbies1 = new ArrayList();
         hobbies1.add(new Hobby("Cykling", ""));
-        
+
         Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
         facade.addPerson(person);
-        assertEquals(2,facade.getPersonsByHobby("Cykling").size());    
+        assertEquals(2, facade.getPersonsByHobby("Cykling").size());
+        
+        facade.deletePerson((person.getId().intValue()));
     }
-    
+
 //    @Test
 //    public void testGetPersonByPhone(){
 //        for(Phone p : phone){
@@ -217,5 +229,4 @@ public class PersonFacadeTest {
 //            assertEquals(p.getNumber(), personWithThePhoneNumber.getPhones().get(0).split(",")[0].split(":")[1]);
 //        }
 //    }
-    
 }

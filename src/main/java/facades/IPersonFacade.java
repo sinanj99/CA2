@@ -28,9 +28,9 @@ public interface IPersonFacade {
     
     public PersonDTO getPersonById(int id);
     
-    public List<PersonDTO> getPersonsByHobby(Hobby hobby);
+    public List<PersonDTO> getPersonsByHobby(String hobbyName);
     
-    public List<PersonDTO> getPersonByCity(Address address);
+    public List<PersonDTO> getPersonsByCity(String city);
     
     public PersonDTO getPersonByPhone(Phone phone);
     

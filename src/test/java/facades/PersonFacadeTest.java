@@ -93,14 +93,18 @@ public class PersonFacadeTest {
             hobbies1.add(new Hobby("Cykling", "Sport på 2 hjul"));
             
             List<Phone> phone2 = new ArrayList();
-            phone1.add(new Phone("99887766", "Mobil"));
+            phone2.add(new Phone("99887766", "Mobil"));
             Address address2 = new Address(new CityInfo("3070", "Snekkersten"), "Klyveren", "Ude");
             List<Hobby> hobbies2 = new ArrayList();
-            hobbies1.add(new Hobby("Sejlads", "Sport til havs"));
+            hobbies2.add(new Hobby("Sejlads", "Sport til havs"));
             
             
             em.getTransaction().begin();
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Address.deleteAllRows").executeUpdate();
+            em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Phone.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Hobby.deleteAllRows").executeUpdate();
             em.persist(new Person("Tom@cphbusiness.dk", "Tom", "Jensen", phone1, address1, hobbies1));
             em.persist(new Person("Kim@cphbusiness.dk", "Kim", "Kimsen", phone2, address2, hobbies2));
             em.persist(personUsedToGetID);
@@ -192,7 +196,18 @@ public class PersonFacadeTest {
             assertEquals(address.getCityInfo().getCity(), person.getCity());
         }
     }
-    
+    @Test
+    public void testGetPersonsByHobby() {
+        List<Phone> phone_ = new ArrayList();
+        phone_.add(new Phone("22558899", "Hjemme nummer"));
+        Address address1 = new Address(new CityInfo("2200", "København NV"), "Tagensvej", "Hjemme");
+        List<Hobby> hobbies1 = new ArrayList();
+        hobbies1.add(new Hobby("Cykling", ""));
+        
+        Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
+        facade.addPerson(person);
+        assertEquals(2,facade.getPersonsByHobby(new Hobby("Cykling","")).size());    
+    }
     
 //    @Test
 //    public void testGetPersonByPhone(){

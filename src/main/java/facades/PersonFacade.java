@@ -67,14 +67,14 @@ public class PersonFacade implements IPersonFacade {
             em.getTransaction().begin();
 
             //for each phone, check if already exists, so we know if it needs to be persisted
-            checkPhone(person,em);
+            checkPhone(person, em);
             //check if address already exists, so we know if it needs to be persisted
-            checkAddress(person,em);
+            checkAddress(person, em);
             //for each hobby, check if already exists, so we know if it needs to be persisted
             List<Hobby> toAdd = new ArrayList();
             List<Hobby> toRemove = new ArrayList();
-            checkHobby(person,toAdd,toRemove, em);
-            
+            checkHobby(person, toAdd, toRemove, em);
+
             person.getHobbies().removeAll(toRemove);
             person.getHobbies().addAll(toAdd);
             em.persist(person);
@@ -140,28 +140,43 @@ public class PersonFacade implements IPersonFacade {
 
     @Override
     public List<PersonDTO> getPersonsByHobby(Hobby hobby) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        EntityManager em = emf.createEntityManager();
+        List<PersonDTO> withHobby = new ArrayList();
+        try {
+            em.getTransaction().begin();
+            hobby = findHobby(hobby, em);
+            System.out.println(hobby.getName());
+            List<PersonDTO> allPersons = getAllPerson();
+            System.out.println(allPersons.get(0).getFirstName());
+            for (PersonDTO p : allPersons) {
+                if (p.getHobbies().contains("name:"+hobby.getName()+",description:"+hobby.getDescription())) {
+                    withHobby.add(p);
+                }
+            }
+        } finally {
+            em.close();
+        }
+        return withHobby;
     }
 
     @Override
     public List<PersonDTO> getPersonByCity(Address address) {
         EntityManager em = emf.createEntityManager();
-        
-        try{
-           TypedQuery<Person> query = 
-                       em.createQuery("Select person from Person person where person.address.cityInfo.city = :address",Person.class);
-           query.setParameter("address", address.getCityInfo().getCity());
-           
-           List<Person> allPersonsInTheCity = query.getResultList();
-           List<PersonDTO> allPersonsInTheCityDTO = new LinkedList<>();
-           
-           for(Person person : allPersonsInTheCity){
-               allPersonsInTheCityDTO.add(new PersonDTO(person));
-           }
-           
-           return allPersonsInTheCityDTO;
-        }
-        finally{
+
+        try {
+            TypedQuery<Person> query
+                    = em.createQuery("Select person from Person person where person.address.cityInfo.city = :address", Person.class);
+            query.setParameter("address", address.getCityInfo().getCity());
+
+            List<Person> allPersonsInTheCity = query.getResultList();
+            List<PersonDTO> allPersonsInTheCityDTO = new LinkedList<>();
+
+            for (Person person : allPersonsInTheCity) {
+                allPersonsInTheCityDTO.add(new PersonDTO(person));
+            }
+
+            return allPersonsInTheCityDTO;
+        } finally {
             em.close();
         }
     }
@@ -193,36 +208,45 @@ public class PersonFacade implements IPersonFacade {
             em.close();
         }
     }
+
     private void checkPhone(Person person, EntityManager em) {
         //for each phone, check if already exists, so we know if it needs to be persisted
-            TypedQuery<Phone> searchPhone;
-            for (Phone phone : person.getPhone()) {
-                searchPhone = em.createQuery("SELECT p.person FROM Phone p WHERE p.number = :number", Phone.class);
-                searchPhone.setParameter("number", phone.getNumber());
-                if (!searchPhone.getResultList().isEmpty()) {
-                    throw new WebApplicationException("Person already exists",409);
-                }
+        TypedQuery<Phone> searchPhone;
+        for (Phone phone : person.getPhone()) {
+            searchPhone = em.createQuery("SELECT p.person FROM Phone p WHERE p.number = :number", Phone.class);
+            searchPhone.setParameter("number", phone.getNumber());
+            if (!searchPhone.getResultList().isEmpty()) {
+                throw new WebApplicationException("Person already exists", 409);
             }
+        }
     }
+
     private void checkAddress(Person person, EntityManager em) {
         TypedQuery<Address> searchAddress
-                    = em.createQuery("SELECT a FROM Address a WHERE a.street = :street", Address.class);
-            searchAddress.setParameter("street", person.getAddress().getStreet());
-            if (!searchAddress.getResultList().isEmpty()) {
-                Address a = searchAddress.getSingleResult();
-                person.setAddress(a);
-            }
+                = em.createQuery("SELECT a FROM Address a WHERE a.street = :street", Address.class);
+        searchAddress.setParameter("street", person.getAddress().getStreet());
+        if (!searchAddress.getResultList().isEmpty()) {
+            Address a = searchAddress.getSingleResult();
+            person.setAddress(a);
+        }
     }
-    private void checkHobby(Person person, List<Hobby>toAdd, List<Hobby>toRemove, EntityManager em) {
+
+    private void checkHobby(Person person, List<Hobby> toAdd, List<Hobby> toRemove, EntityManager em) {
         TypedQuery<Hobby> searchHobby;
-            for (Hobby hobby : person.getHobbies()) {
-                searchHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class);
-                searchHobby.setParameter("name", hobby.getName());
-                if (!searchHobby.getResultList().isEmpty()) {
-                    toRemove.add(hobby);
-                    hobby = searchHobby.getSingleResult();
-                    toAdd.add(hobby);
-                }
+        for (Hobby hobby : person.getHobbies()) {
+            searchHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class);
+            searchHobby.setParameter("name", hobby.getName());
+            if (!searchHobby.getResultList().isEmpty()) {
+                toRemove.add(hobby);
+                hobby = searchHobby.getSingleResult();
+                toAdd.add(hobby);
             }
+        }
     }
+
+    private Hobby findHobby(Hobby h, EntityManager em) {
+        return em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class)
+                .setParameter("name", h.getName()).getSingleResult();
+    }
+
 }

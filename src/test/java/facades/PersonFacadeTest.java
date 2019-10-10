@@ -188,12 +188,12 @@ public class PersonFacadeTest {
     }
     
     @Test
-    public void testGetPersonByCity()
+    public void testGetPersonsByCity()
     {
-        List<PersonDTO> allPersonsInTheCity = facade.getPersonByCity(address);
+        List<PersonDTO> allPersonsInTheCity = facade.getPersonsByCity("Helsingør");
         
         for(PersonDTO person : allPersonsInTheCity){
-            assertEquals(address.getCityInfo().getCity(), person.getCity());
+            assertEquals("Helsingør", person.getCity());
         }
     }
     @Test
@@ -206,7 +206,7 @@ public class PersonFacadeTest {
         
         Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
         facade.addPerson(person);
-        assertEquals(2,facade.getPersonsByHobby(new Hobby("Cykling","")).size());    
+        assertEquals(2,facade.getPersonsByHobby("Cykling").size());    
     }
     
 //    @Test

@@ -139,17 +139,16 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-    public List<PersonDTO> getPersonsByHobby(Hobby hobby) {
+    public List<PersonDTO> getPersonsByHobby(String hobbyName) {
         EntityManager em = emf.createEntityManager();
         List<PersonDTO> withHobby = new ArrayList();
+        Hobby hobby;
         try {
             em.getTransaction().begin();
-            hobby = findHobby(hobby, em);
-            System.out.println(hobby.getName());
+            hobby = findHobby(hobbyName, em);
             List<PersonDTO> allPersons = getAllPerson();
-            System.out.println(allPersons.get(0).getFirstName());
             for (PersonDTO p : allPersons) {
-                if (p.getHobbies().contains("name:"+hobby.getName()+",description:"+hobby.getDescription())) {
+                if (p.getHobbies().contains("name:" + hobby.getName() + ",description:" + hobby.getDescription())) {
                     withHobby.add(p);
                 }
             }
@@ -160,22 +159,11 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-    public List<PersonDTO> getPersonByCity(Address address) {
+    public List<PersonDTO> getPersonsByCity(String city) {
         EntityManager em = emf.createEntityManager();
-
         try {
-            TypedQuery<Person> query
-                    = em.createQuery("Select person from Person person where person.address.cityInfo.city = :address", Person.class);
-            query.setParameter("address", address.getCityInfo().getCity());
-
-            List<Person> allPersonsInTheCity = query.getResultList();
-            List<PersonDTO> allPersonsInTheCityDTO = new LinkedList<>();
-
-            for (Person person : allPersonsInTheCity) {
-                allPersonsInTheCityDTO.add(new PersonDTO(person));
-            }
-
-            return allPersonsInTheCityDTO;
+             return em.createQuery("SELECT new dto.PersonDTO(p) from Person p WHERE p.address.cityInfo.city = :city")
+                    .setParameter("city", city).getResultList();
         } finally {
             em.close();
         }
@@ -244,9 +232,9 @@ public class PersonFacade implements IPersonFacade {
         }
     }
 
-    private Hobby findHobby(Hobby h, EntityManager em) {
+    private Hobby findHobby(String hobbyName, EntityManager em) {
         return em.createQuery("SELECT h FROM Hobby h WHERE h.name = :name", Hobby.class)
-                .setParameter("name", h.getName()).getSingleResult();
+                .setParameter("name", hobbyName).getSingleResult();
     }
 
 }

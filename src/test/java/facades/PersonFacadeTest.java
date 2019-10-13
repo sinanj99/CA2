@@ -91,7 +91,6 @@ public class PersonFacadeTest {
             List<Hobby> hobbies1 = new ArrayList();
             hobbies1.add(new Hobby("Cykling", "Sport på 2 hjul"));
             Person p1 = new Person("Tom@cphbusiness.dk", "Tom", "Jensen", phone1, address1, hobbies1);
-            
 
             List<Phone> phone2 = new ArrayList();
             phone2.add(new Phone("99887766", "Mobil"));
@@ -132,18 +131,23 @@ public class PersonFacadeTest {
 
     @Test
     public void testAddPerson() {
-        Long count;
-
-        List<Phone> phone1 = new ArrayList();
-        phone1.add(new Phone("5555555", "Hjemme nummer"));
-        Address address1 = new Address(new CityInfo("3000", "Helsingør"), "Rosenkildevej", "Hjemme");
-        List<Hobby> hobbies1 = new ArrayList();
-        hobbies1.add(new Hobby("100m Løb", "Det skal gå hurtigt"));
-
-        Person person = new Person("Ida@cphbusiness.dk", "Ida", "Larsen", phone1, address1, hobbies1);
-
-        count = facade.getPersonCount();
-        facade.addPerson(person);
+        PersonDTO pdto = new PersonDTO();
+        pdto.setFirstName("Ida");
+        pdto.setLastName("Larsen");
+        pdto.setEmail("ida@cphbusiness.dk");
+        pdto.setCity("Helsingør");
+        pdto.setStreet("Rosenkildevej");
+        pdto.setStreetInfo("Hjemme");
+        pdto.setZip("3000");
+        List<String> hobbies = new ArrayList();
+        List<String> phones = new ArrayList();
+        hobbies.add("name:100m Løb,description:Det skal gå hurtigt");
+        phones.add("number:55555555,description:Hjemmenummer");
+        pdto.setHobbies(hobbies);
+        pdto.setPhones(phones);
+        Long count = facade.getPersonCount();
+        facade.addPerson(pdto);
+        System.out.println(pdto.getId());
 
         //if the person above got persisted, the person count should be equal to the count before it got persisted +1 
         assertEquals(count + 1, facade.getPersonCount());
@@ -151,24 +155,30 @@ public class PersonFacadeTest {
 
     @Test
     public void testEditPerson() {
-        List<Phone> phone_ = new ArrayList();
-        phone_.add(new Phone("22558899", "Hjemme nummer"));
-        Address address1 = new Address(new CityInfo("2200", "København NV"), "Tagensvej", "Hjemme");
-        List<Hobby> hobbies1 = new ArrayList();
-        hobbies1.add(new Hobby("Styrketræning", "Det skal være tungt"));
+        
+        PersonDTO pdto = new PersonDTO();
+        pdto.setFirstName("Peter");
+        pdto.setLastName("Kolding");
+        pdto.setEmail("peter@cphbusiness.dk");
+        pdto.setCity("København NV");
+        pdto.setStreet("Tagensvej");
+        pdto.setStreetInfo("Hjemme");
+        pdto.setZip("2200");
+        List<String> hobbies = new ArrayList();
+        List<String> phones = new ArrayList();
+        hobbies.add("name:Styrketræning,description:Det skal være tungt");
+        phones.add("number:22558899,description:Hjemmenummer");
+        pdto.setHobbies(hobbies);
+        pdto.setPhones(phones);
+        pdto = facade.addPerson(pdto);
+        pdto.setFirstName("Abdi");
+        pdto.setLastName("Mahamad Yusuf Osman 2pac");
+        facade.editPerson(pdto);
 
-        Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
-        facade.addPerson(person);
-
-        person.setFirstName("Abdi");
-        person.setLastName("Mahamad Yusuf Osman 2pac");
-        facade.editPerson(person);
-
-        PersonDTO personActual = facade.getPersonById(person.getId().intValue());
+        PersonDTO personActual = facade.getPersonById(pdto.getId().intValue());
 
         //Firstname
         assertEquals("Abdi", personActual.getFirstName());
-
         //Lastname
         assertEquals("Mahamad Yusuf Osman 2pac", personActual.getLastName());
     }
@@ -207,26 +217,28 @@ public class PersonFacadeTest {
     }
 
     @Test
-    public void testGetPersonsByHobby() {
-        List<Phone> phone_ = new ArrayList();
-        phone_.add(new Phone("22558899", "Hjemme nummer"));
-        Address address1 = new Address(new CityInfo("2200", "København NV"), "Tagensvej", "Hjemme");
-        List<Hobby> hobbies1 = new ArrayList();
-        hobbies1.add(new Hobby("Cykling", ""));
-
-        Person person = new Person("Peter@cphbusiness.dk", "Peter", "Kolding", phone_, address1, hobbies1);
-        facade.addPerson(person);
+    public void testGetPersonsByHobby() {   
+        PersonDTO pdto = new PersonDTO();
+        pdto.setFirstName("Peter");
+        pdto.setLastName("Kolding");
+        pdto.setEmail("peter@cphbusiness.dk");
+        pdto.setCity("København NV");
+        pdto.setStreet("Tagensvej");
+        pdto.setStreetInfo("Hjemme");
+        pdto.setZip("2200");
+        List<String> hobbies = new ArrayList();
+        List<String> phones = new ArrayList();
+        hobbies.add("name:Cykling,description:sne");
+        phones.add("number:22558899,description:Hjemmenummer");
+        pdto.setHobbies(hobbies);
+        pdto.setPhones(phones);
+        facade.addPerson(pdto);
         assertEquals(2, facade.getPersonsByHobby("Cykling").size());
-        
-        facade.deletePerson((person.getId().intValue()));
     }
 
-//    @Test
-//    public void testGetPersonByPhone(){
-//        for(Phone p : phone){
-//            PersonDTO personWithThePhoneNumber = facade.getPersonByPhone(p);
-//            
-//            assertEquals(p.getNumber(), personWithThePhoneNumber.getPhones().get(0).split(",")[0].split(":")[1]);
-//        }
-//    }
+    @Test
+    public void testGetPersonByPhone(){
+        assertEquals(personUsedToGetID.getFirstName(),
+                facade.getPersonByPhone("55661122").getFirstName());
+    }
 }

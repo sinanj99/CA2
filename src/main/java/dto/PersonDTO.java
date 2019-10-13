@@ -13,7 +13,8 @@ import java.util.Set;
 
 @Schema(name = "Person")
 public class PersonDTO {
-
+    
+    @Schema(hidden = true)
     private Long id;
     @Schema(example = "lars@lars.dk")
     private String email;
@@ -35,6 +36,7 @@ public class PersonDTO {
     private List<String> hobbies = new ArrayList();
 
     public PersonDTO(Person p) {
+        this.id = p.getId();
         this.email = p.getEmail();
         this.firstName = p.getFirstName();
         this.lastName = p.getLastName();

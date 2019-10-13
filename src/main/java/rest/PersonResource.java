@@ -92,20 +92,55 @@ public class PersonResource {
         return p;
     }
 
+    @Operation(summary = "Get person by phone number",
+            tags = {"person"},
+            responses = {
+                @ApiResponse(
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
+                @ApiResponse(responseCode = "200", description = "The Requested Person"),
+                @ApiResponse(responseCode = "404", description = "Person not found")})
+    @GET
+    @Path("phone/{phone}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PersonDTO getPersonByPhone(@PathParam("phone") String phone) {
+        try {
+            return FACADE.getPersonByPhone(phone);
+        } catch (NullPointerException e) {
+            throw new WebApplicationException("Person not found", 404);
+        }
+    }
     @Operation(summary = "Get persons by city",
-            tags = {"person, city"},
+            tags = {"person"},
             responses = {
                 @ApiResponse(
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
                 @ApiResponse(responseCode = "200", description = "The requested persons"),
                 @ApiResponse(responseCode = "404", description = "Person not found")})
-    
+
     @GET
     @Path("city/{city}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<PersonDTO> getPersonsByCity(@PathParam("city") String city) {
         try {
             return FACADE.getPersonsByCity(city);
+        } catch (NullPointerException e) {
+            throw new WebApplicationException("Person not found", 404);
+        }
+    }
+
+    @Operation(summary = "Get persons by city",
+            tags = {"person"},
+            responses = {
+                @ApiResponse(
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = PersonDTO.class))),
+                @ApiResponse(responseCode = "200", description = "The requested persons"),
+                @ApiResponse(responseCode = "404", description = "Person not found")})
+    @GET
+    @Path("hobby/{hobby}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<PersonDTO> getPersonsByHobby(@PathParam("hobby") String hobby) {
+        try {
+            return FACADE.getPersonsByHobby(hobby);
         } catch (NullPointerException e) {
             throw new WebApplicationException("Person not found", 404);
         }
@@ -143,8 +178,7 @@ public class PersonResource {
                 || personDTO.getZip() == null) {
             throw new WebApplicationException("Not all arguments provided with the body", 400);
         }
-        Person person = personDTO.DTOMapper(personDTO);
-        return FACADE.addPerson(person);
+        return FACADE.addPerson(personDTO);
     }
 
     @PUT
@@ -162,11 +196,8 @@ public class PersonResource {
         if (personDTO.getId() == null) {
             throw new WebApplicationException("No id provided", 400);
         }
-        Person person = personDTO.DTOMapper(personDTO);
-        person.setId(personDTO.getId());
-
         try {
-            personDTO = new PersonDTO(FACADE.editPerson(person));
+            personDTO = new PersonDTO(FACADE.editPerson(personDTO));
         } catch (NullPointerException e) {
             throw new WebApplicationException("Person not found", 404);
         }

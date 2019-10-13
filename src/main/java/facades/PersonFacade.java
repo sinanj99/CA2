@@ -6,6 +6,7 @@
 package facades;
 
 import dto.PersonDTO;
+import dto.PersonDTOMapper;
 import entities.Address;
 import entities.Hobby;
 import entities.Person;
@@ -26,7 +27,7 @@ public class PersonFacade implements IPersonFacade {
 
     private static PersonFacade instance;
     private static EntityManagerFactory emf;
-
+    private static PersonDTOMapper mapper = new PersonDTOMapper();
     //Private Constructor to ensure Singleton
     private PersonFacade() {
     }
@@ -50,7 +51,7 @@ public class PersonFacade implements IPersonFacade {
 
     //TODO Remove/Change this before use
     public long getPersonCount() {
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = getEntityManager();
         try {
             long PersonCount = (long) em.createQuery("SELECT COUNT(person) FROM Person person").getSingleResult();
             return PersonCount;
@@ -61,11 +62,11 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-    public PersonDTO addPerson(Person person) {
-        EntityManager em = emf.createEntityManager();
+    public PersonDTO addPerson(PersonDTO personDTO) {
+        EntityManager em = getEntityManager();
+        Person person = mapper.DTOMapper(personDTO);
         try {
             em.getTransaction().begin();
-
             //for each phone, check if already exists, so we know if it needs to be persisted
             checkPhone(person, em);
             //check if address already exists, so we know if it needs to be persisted
@@ -74,7 +75,6 @@ public class PersonFacade implements IPersonFacade {
             List<Hobby> toAdd = new ArrayList();
             List<Hobby> toRemove = new ArrayList();
             checkHobby(person, toAdd, toRemove, em);
-
             person.getHobbies().removeAll(toRemove);
             person.getHobbies().addAll(toAdd);
             em.persist(person);
@@ -100,10 +100,14 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-    public Person editPerson(Person person) {
+    public Person editPerson(PersonDTO personDTO) {
         EntityManager em = emf.createEntityManager();
+        Person person = mapper.DTOMapper(personDTO);
+        System.out.println(personDTO.getId());
+        person.setId(personDTO.getId());
         try {
             if (em.find(Person.class, person.getId()) == null) {
+                System.out.println("sne");
                 throw new NullPointerException();
             }
             em.getTransaction().begin();
@@ -170,21 +174,17 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-    public PersonDTO getPersonByPhone(Phone phone) {
-//        EntityManager em = emf.createEntityManager();
-//        
-//        try{
-//            TypedQuery<Person> query = 
-//                       em.createQuery("Select person from Person person where person.phone.number = :number",Person.class);
-//            query.setParameter("number", phone.getNumber());
-//            
-//            return new PersonDTO(query.getSingleResult());
-//        }
-//        finally{
-//            em.close();
-//        }
+    public PersonDTO getPersonByPhone(String phoneNr) {
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+             return em.createQuery("SELECT new dto.PersonDTO(p.person) FROM Phone p where p.number = :number",PersonDTO.class)
+            .setParameter("number", phoneNr).getSingleResult();
+        }
+        finally{
+            em.close();
+        }
 
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

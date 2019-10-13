@@ -18,11 +18,11 @@ import java.util.List;
  */
 public interface IPersonFacade {
     
-    public PersonDTO addPerson(Person person);
+    public PersonDTO addPerson(PersonDTO personDTO);
     
     public Person deletePerson(int id);
     
-    public Person editPerson(Person person);
+    public Person editPerson(PersonDTO personDTO);
     
     public List<PersonDTO> getAllPerson();
     
@@ -32,6 +32,6 @@ public interface IPersonFacade {
     
     public List<PersonDTO> getPersonsByCity(String city);
     
-    public PersonDTO getPersonByPhone(Phone phone);
+    public PersonDTO getPersonByPhone(String phoneNr);
     
 }

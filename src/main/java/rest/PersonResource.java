@@ -41,7 +41,7 @@ import javax.ws.rs.core.MediaType;
                 title = "Person API",
                 version = "0.4",
                 description = "API to get info about persons.",
-                contact = @Contact(name = "Lars Mortensen", email = "lam@cphbusiness.dk")
+                contact = @Contact(name = "Sinan Jasar", email = "sinanjasar@live.dk")
         ),
         tags = {
             @Tag(name = "person", description = "API related to person Info")
@@ -50,11 +50,11 @@ import javax.ws.rs.core.MediaType;
         servers = {
             @Server(
                     description = "For Local host testing",
-                    url = "http://localhost:8080/startcodeoas"
+                    url = "http://localhost:8080/CA2"
             ),
             @Server(
                     description = "Server API",
-                    url = "https://sinanjasar"
+                    url = "https://sinanjasar.dk/CA2"
             )
 
         }
